@@ -1,0 +1,246 @@
+<template>
+  <div class="flex flex-col min-h-screen bg-gray-100">
+    <Header />
+    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+      <!-- O 'page-container' agora usa flexbox para controlar a altura -->
+      <div class="page-container">
+        <div class="header-container">
+          <div class="header-left">
+            <div class="user-info-wrapper">
+              <div class="user-info" @click="toggleDropdown">
+                <UserCircleIcon class="user-icon"/>
+                <span class="user-name">{{ userName }}</span>
+              </div>
+              <div v-if="isDropdownOpen" class="dropdown-menu">
+                <button @click="handleLogout" class="dropdown-item">Sair</button>
+              </div>
+            </div>
+            <h2 class="container-title">Monitoramento de Requisições</h2>
+          </div>
+          <button @click="goToRequisicao" class="button-secondary-nav">Ir para Requisições</button>
+        </div>
+
+        <!-- NOVO CONTAINER PARA A BARRA DE ROLAGEM E RESPONSIVIDADE -->
+        <div class="table-scroll-container">
+          <div v-if="loading" class="loading-message">Carregando requisições...</div>
+          <table v-else class="responsive-table">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>UR</th>
+                <th>Número</th>
+                <th>Situação</th>
+                <th>Observação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody v-if="!loading">
+              <tr v-if="requisicoes.length === 0">
+                <td colspan="6" class="no-data-message">Nenhuma requisição em monitoramento.</td>
+              </tr>
+              <tr v-for="req in requisicoes" :key="req.id_requisicao" class="hover:bg-gray-50">
+                <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
+                <td data-label="UR">{{ req.requisitante_requisicao }}</td>
+                <td data-label="Número">{{ req.numero_requisicao }}</td>
+                <td data-label="Situação">
+                  <span :class="['status-badge', getStatusClass(req.situacao.descricao_situacao_requisicao)]">
+                    {{ req.situacao.descricao_situacao_requisicao }}
+                  </span>
+                </td>
+                <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
+                <td data-label="Ações">
+                  <div class="acoes-cell">
+                    <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" title="Visualizar Itens" />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    
+    <VisualizarItensPopup 
+      :visible="showItensPopup" 
+      :requisicao="requisicaoSelecionada" 
+      @close="closeVisualizarItensPopup" 
+    />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import Header from '@/components/Header.vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { UserCircleIcon, EyeIcon } from '@heroicons/vue/24/outline';
+import VisualizarItensPopup from '../components/VisualizarItensPopup.vue';
+import { obterRequisicoesMonitoramento } from '../http/index';
+import type { IRequisicoes } from '../interfaces/IRequisicoes';
+
+const router = useRouter();
+const requisicoes = ref<IRequisicoes[]>([]);
+const loading = ref(true);
+const userName = ref('Usuário');
+const isDropdownOpen = ref(false);
+const showItensPopup = ref(false);
+const requisicaoSelecionada = ref<IRequisicoes | null>(null);
+
+onMounted(async () => {
+  const token = localStorage.getItem('user-token');
+  if (token) {
+      try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userName.value = payload.nome || 'Usuário'; 
+      } catch (e) {
+          userName.value = 'Usuário';
+      }
+  }
+  await carregarDados();
+});
+
+async function carregarDados() {
+  loading.value = true;
+  try {
+    requisicoes.value = await obterRequisicoesMonitoramento();
+  } catch (error: any) {
+    alert(`Erro ao buscar dados de monitoramento: ${error.message}`);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function openVisualizarItensPopup(req: IRequisicoes) {
+  requisicaoSelecionada.value = req;
+  showItensPopup.value = true;
+}
+
+function closeVisualizarItensPopup() {
+  showItensPopup.value = false;
+}
+
+function toggleDropdown() { isDropdownOpen.value = !isDropdownOpen.value; }
+
+function handleLogout() {
+  localStorage.removeItem('user-token');
+  router.push({ name: 'Login' });
+}
+
+function goToRequisicao() {
+    router.push({ name: 'Requisicao' });
+}
+
+function getStatusClass(situacao: string): string {
+  if (!situacao) return 'status-pendente'; 
+  
+  const statusNormalizado = situacao
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+    .replace(/\s+/g, '-');
+
+  const statusMap: { [key: string]: string } = {
+    'pendente': 'status-pendente',
+    'em-atendimento': 'status-em-atendimento',
+    'em-separacao': 'status-em-separacao',
+    'em-conferencia': 'status-em-conferencia',
+    'em-embalagem': 'status-em-embalagem',
+    'em-expedicao': 'status-em-expedicao',
+    'concluida': 'status-concluida',
+    'cancelada': 'status-cancelada'
+  };
+
+  return statusMap[statusNormalizado] || 'status-pendente';
+}
+</script>
+
+<style scoped>
+/* ESTILOS ATUALIZADOS PARA SCROLL E RESPONSIVIDADE */
+.page-container { 
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 8rem); /* Altura da tela menos o padding do main */
+  background-color: #fff; 
+  padding: 20px; 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+}
+.header-container { flex-shrink: 0; }
+
+.table-scroll-container {
+  flex-grow: 1; /* Faz a área da tabela crescer */
+  overflow-y: auto; /* Adiciona scroll vertical quando necessário */
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+}
+
+/* Estilos existentes */
+.header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.header-left { display: flex; flex-direction: column; align-items: flex-start; }
+.user-info-wrapper { position: relative; margin-bottom: 8px; }
+.user-info { display: flex; align-items: center; cursor: pointer; padding: 4px; border-radius: 6px; }
+.user-info:hover { background-color: #f3f4f6; }
+.user-icon { width: 20px; height: 20px; color: #4b5563; margin-right: 8px; }
+.user-name { font-weight: 500; font-size: 0.9rem; color: #374151; }
+.container-title { font-weight: bold; font-size: 1.5em; color: #333; margin: 0; }
+.dropdown-menu { position: absolute; top: 100%; left: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 10; padding: 8px 0; min-width: 120px; margin-top: 4px; }
+.dropdown-item { display: block; width: 100%; text-align: left; padding: 8px 16px; font-size: 0.9rem; color: #374151; background: none; border: none; cursor: pointer; }
+.dropdown-item:hover { background-color: #f3f4f6; }
+.button-secondary-nav { padding: 10px 15px; background-color: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+.button-secondary-nav:hover { background-color: #5a6268; }
+table { width: 100%; border-collapse: collapse; }
+thead { background-color: #f8f9fa; position: sticky; top: 0; z-index: 1; }
+th, td { border-bottom: 1px solid #e9ecef; padding: 12px 15px; text-align: left; vertical-align: middle; }
+th { font-weight: 600; color: #495057; text-transform: uppercase; font-size: 0.85rem; }
+tbody tr:hover { background-color: #eef2f7; }
+.status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: white; }
+.status-pendente { background-color: #6b7280; }
+.status-em-atendimento { background-color: #f59e0b; }
+.status-em-separacao { background-color: #3b82f6; }
+.status-em-conferencia { background-color: #ea580c; }
+.status-em-embalagem { background-color: #14b8a6; }
+.status-em-expedicao { background-color: #6366f1; }
+.status-concluida { background-color: #22c55e; }
+.status-cancelada { background-color: #ef4444; }
+.no-data-message, .loading-message { text-align: center; padding: 20px; color: #6c757d; font-style: italic; }
+.acoes-cell { display: flex; align-items: center; gap: 16px; justify-content: center; }
+.icon-acao { width: 22px; height: 22px; color: #4b5563; cursor: pointer; transition: color 0.2s; }
+.icon-acao:hover { color: #007bff; }
+
+/* REGRAS DE RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .responsive-table thead {
+    display: none;
+  }
+  .responsive-table tr {
+    display: block;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .responsive-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+  }
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-align: left;
+    margin-right: 1rem;
+    color: #374151;
+  }
+  .acoes-cell {
+      justify-content: flex-end;
+  }
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
