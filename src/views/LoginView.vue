@@ -27,7 +27,7 @@
           <EyeSlashIcon v-else @click="togglePassword" class="icon clickable" />
         </div>
         <button type="submit" class="button-primary" :disabled="isLoading">
-          {{ isLoading ? 'A entrar...' : 'Entrar' }}
+          {{ isLoading ? 'Conectando...' : 'Entrar' }}
         </button>
       </form>
     </div>
