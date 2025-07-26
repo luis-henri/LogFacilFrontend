@@ -191,6 +191,7 @@ function toggleSelectAll(event: Event) {
 
 function toggleRowSelection(req: IRequisicoes) { req.checked = !req.checked; }
 
+
 async function iniciarSeparacaoEmMassa() {
     const selecionadas = requisicoes.value.filter(req => req.checked);
     if (selecionadas.length === 0) {
@@ -200,12 +201,15 @@ async function iniciarSeparacaoEmMassa() {
     
     isSaving.value = true;
     try {
+        // ATUALIZADO: Muda o status para 'em-atendimento' (ID 2)
         const promessas = selecionadas.map(req => 
-            atualizarRequisicao(req.id_requisicao, { status: 'em-separacao' })
+            atualizarRequisicao(req.id_requisicao, { status: 'em-atendimento' })
         );
         await Promise.all(promessas);
-        await carregarDados();
+
         alert(`${selecionadas.length} requisição(ões) enviada(s) para separação.`);
+        // ATUALIZADO: Navega para a nova tela de lista de separação
+        router.push({ name: 'Separacao' });
     } catch (error) {
         console.error("Erro ao iniciar separação em massa:", error);
         alert("Ocorreu um erro ao enviar as requisições para separação.");
