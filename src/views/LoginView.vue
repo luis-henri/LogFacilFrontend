@@ -38,6 +38,7 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { loginUsuario } from '../http';
+import { UserCircleIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
 const cpf = ref('');
