@@ -30,10 +30,12 @@
                   <td data-label="Material">{{ item.descricao_material_item_requisicao }}</td>
                   <td data-label="Qtd. Solicitada">{{ item.quantidade_solicitada_item_requisicao }}</td>
                   <td data-label="Qtd. Atendida">
-                    <input 
+                    <input
                       type="number" 
                       class="input-qty"
                       v-model.number="item.quantidade_atendida_item_requisicao"
+                      :max="item.quantidade_solicitada_item_requisicao"
+                      min="0"
                     >
                   </td>
                 </tr>
@@ -72,7 +74,7 @@ onMounted(async () => {
     requisicao.value = await obterRequisicaoPorId(requisicaoId);
     if (requisicao.value) {
         requisicao.value.itens.forEach(item => {
-            item.quantidade_atendida_item_requisicao = item.quantidade_solicitada_item_requisicao;
+            item.quantidade_atendida_item_requisicao = 0;
         });
     }
   } catch (error) {
