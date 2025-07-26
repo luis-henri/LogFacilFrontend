@@ -13,7 +13,8 @@
             placeholder="CPF" 
             maxlength="14"
             required
-          />
+            />
+            <UserCircleIcon class="icon"/>
         </div>
         <div class="input-group">
           <input
@@ -22,6 +23,8 @@
             placeholder="Senha"
             required
           />
+          <EyeIcon v-if="!showPassword" @click="togglePassword" class="icon clickable" />
+          <EyeSlashIcon v-else @click="togglePassword" class="icon clickable" />
         </div>
         <button type="submit" class="button-primary" :disabled="isLoading">
           {{ isLoading ? 'A entrar...' : 'Entrar' }}
@@ -52,6 +55,10 @@ watch(cpf, (newValue) => {
   if (maskedValue.length > 14) maskedValue = maskedValue.slice(0, 14);
   cpf.value = maskedValue;
 });
+
+function togglePassword() {
+  showPassword.value = !showPassword.value;
+}
 
 async function handleLogin() {
   if (!cpf.value || !password.value) {
