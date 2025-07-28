@@ -52,21 +52,45 @@
         </footer>
       </div>
     </main>
+    <NotificationPopUp
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
 import { obterRequisicaoPorId, atualizarRequisicao } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const route = useRoute();
 const router = useRouter();
 const requisicao = ref<IRequisicoes | null>(null);
 const loading = ref(true);
 const isSaving = ref(false);
+
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 
 onMounted(async () => {
   const requisicaoId = route.params.id as string;
@@ -78,8 +102,8 @@ onMounted(async () => {
         });
     }
   } catch (error) {
-    console.error("Erro ao buscar dados da requisição para separação:", error);
-    alert("Não foi possível carregar os dados da requisição.");
+    console.error("Erro", error);
+    showNotification('Erro', "Não foi possível carregar os dados da requisição.");
   } finally {
     loading.value = false;
   }
@@ -99,8 +123,8 @@ async function efetivarSeparacao() {
     await atualizarRequisicao(requisicao.value.id_requisicao, dadosParaAtualizar);
     router.push({ name: 'Conferencia' });
   } catch (error) {
-    console.error("Erro ao efetivar separação:", error);
-    alert("Não foi possível efetivar a separação.");
+    console.error("Erro", error);
+    showNotification('Erro', "Não foi possível efetivar a separação.");
   } finally {
     isSaving.value = false;
   }

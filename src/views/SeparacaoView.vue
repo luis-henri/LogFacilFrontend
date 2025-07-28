@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
 import { obterRequisicoesPorStatus } from '../http';

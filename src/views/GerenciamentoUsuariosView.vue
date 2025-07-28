@@ -137,13 +137,20 @@
         </div>
       </div>
     </transition>
+    <NotificationPopUp
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, reactive } from 'vue';
 import { obterUsuarios, registrarUsuario, atualizarUsuario as apiAtualizarUsuario } from '../http';
 import type { IUsuario } from '../interfaces/IUsuario';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const modoAtual = ref('consultar');
 const mostrarModalAdicionar = ref(false);
@@ -153,6 +160,23 @@ const loading = ref(true);
 const filtros = ref({ nome: '', email: '', cpf: '' });
 const novoUsuarioForm = ref({ nome: '', email: '', cpf: '', senha: '' });
 const usuarioEmEdicao = ref<(IUsuario & { senha?: string; ativo?: boolean }) | null>(null);
+
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string) {
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 
 onMounted(async () => {
   await carregarUsuarios();
@@ -164,7 +188,7 @@ async function carregarUsuarios() {
     usuarios.value = await obterUsuarios();
   } catch (error) {
     console.error("Erro ao carregar usuários:", error);
-    alert("Não foi possível carregar a lista de usuários.");
+    showNotification('Erro', "Não foi possível carregar a lista de usuários.");
   } finally {
     loading.value = false;
   }
@@ -172,11 +196,11 @@ async function carregarUsuarios() {
 
 const adicionarUsuario = async () => {
   if (novoUsuarioForm.value.cpf.length !== 14) {
-    alert('Por favor, digite um CPF válido com 11 números.');
+    showNotification('Erro', 'Por favor, digite um CPF válido com 11 números.');
     return;
   }
   if (!novoUsuarioForm.value.senha) {
-    alert('O campo senha é obrigatório.');
+    showNotification('Erro','O campo senha é obrigatório.');
     return;
   }
 
@@ -187,11 +211,11 @@ const adicionarUsuario = async () => {
       cpf: novoUsuarioForm.value.cpf.replace(/[.\-]/g, ''),
       password: novoUsuarioForm.value.senha
     });
-    alert('Usuário adicionado com sucesso!');
+    showNotification('Sucess','Usuário adicionado com sucesso!');
     fecharModalAdicionar();
     await carregarUsuarios();
   } catch(error: any) {
-    alert(`Erro ao adicionar usuário: ${error.message}`);
+    showNotification('Erro',`Erro ao adicionar usuário: ${error.message}`);
   }
 };
 
@@ -215,11 +239,11 @@ const handleAtualizarUsuario = async () => {
       senha: usuarioEmEdicao.value.senha,
       ativo: usuarioEmEdicao.value.ativo
     });
-    alert('Usuário atualizado com sucesso!');
+     showNotification('','Usuário atualizado com sucesso!');
     cancelarEdicao();
     await carregarUsuarios();
   } catch(error: any) {
-    alert(`Erro ao atualizar usuário: ${error.message}`);
+     showNotification('',`Erro ao atualizar usuário: ${error.message}`);
   }
 };
 

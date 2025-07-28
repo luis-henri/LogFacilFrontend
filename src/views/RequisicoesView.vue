@@ -31,7 +31,7 @@
                 <th>Número</th>
                 <th>Situação</th>
                 <th>Observação</th>
-                <th>Prioridade - Envio</th>
+                <th>Prior - Envio</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -106,18 +106,26 @@
         @close="closeCancelarPopup" 
         @confirm="handleCancelarConfirm" 
     />
+
+    <NotificationPopUp
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserCircleIcon, TruckIcon, EyeIcon, TrashIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
 import Header from '../components/Header.vue';
 import PopUp from '../components/PopUp.vue';
 import VisualizarItensPopup from '../components/VisualizarItensPopup.vue';
 import ConfirmarCancelamentoPopup from '../components/ConfirmarCancelamentoPopup.vue';
-import { obterRequisicoesPorStatus, cancelarRequisicao, atualizarRequisicao, obterTiposEnvio } from '../http/index';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
+import { obterRequisicoesPorStatus, atualizarRequisicao, obterTiposEnvio } from '../http/index';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 
 const router = useRouter();
@@ -132,6 +140,25 @@ const showItensPopup = ref(false);
 const showCancelarPopup = ref(false);
 const requisicaoSelecionada = ref<IRequisicoes | null>(null);
 const tiposEnvio = ref<any[]>([]);
+
+// NOVO ESTADO PARA O POPUP DE NOTIFICAÇÃO
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+// NOVA FUNÇÃO PARA EXIBIR O POPUP
+function showNotification(title: string, message: string) {
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 
 const sortedRequisicoes = computed(() => {
   return [...requisicoes.value].sort((a, b) => {
@@ -195,29 +222,25 @@ function toggleRowSelection(req: IRequisicoes) { req.checked = !req.checked; }
 async function iniciarSeparacaoEmMassa() {
     const selecionadas = requisicoes.value.filter(req => req.checked);
     if (selecionadas.length === 0) {
-        alert("Por favor, selecione pelo menos uma requisição para iniciar a separação.");
+        showNotification('Atenção', "Por favor, selecione pelo menos uma requisição para iniciar a separação.");
         return;
     }
     
     isSaving.value = true;
     try {
-        // ATUALIZADO: Muda o status para 'em-atendimento' (ID 2)
         const promessas = selecionadas.map(req => 
-            atualizarRequisicao(req.id_requisicao, { status: 'em-atendimento' })
+            atualizarRequisicao(req.id_requisicao, { status: 'em-separacao' })
         );
         await Promise.all(promessas);
-
-        alert(`${selecionadas.length} requisição(ões) enviada(s) para separação.`);
-        // ATUALIZADO: Navega para a nova tela de lista de separação
-        router.push({ name: 'Separacao' });
+        await carregarDados();
+        showNotification('Sucesso', `${selecionadas.length} requisição(ões) enviada(s) para separação.`);
     } catch (error) {
         console.error("Erro ao iniciar separação em massa:", error);
-        alert("Ocorreu um erro ao enviar as requisições para separação.");
+        showNotification('Erro', "Ocorreu um erro ao enviar as requisições para separação.");
     } finally {
         isSaving.value = false;
     }
 }
-
 async function handleTogglePrioridade(req: IRequisicoes) {
     const index = requisicoes.value.findIndex(r => r.id_requisicao === req.id_requisicao);
     if (index !== -1) {
@@ -227,7 +250,7 @@ async function handleTogglePrioridade(req: IRequisicoes) {
             requisicoes.value[index].prioridade_requisicao = novoStatusPrioridade;
         } catch (error) {
             console.error("Erro ao atualizar prioridade:", error);
-            alert("Não foi possível alterar a prioridade.");
+             showNotification('Erro',"Não foi possível alterar a prioridade.");
         }
     }
 }
@@ -275,10 +298,13 @@ function closeCancelarPopup() { showCancelarPopup.value = false; }
 async function handleCancelarConfirm() {
   if (requisicaoSelecionada.value) {
     try {
-      await cancelarRequisicao(requisicaoSelecionada.value.id_requisicao);
-      await carregarDados();
+      await atualizarRequisicao(requisicaoSelecionada.value.id_requisicao, { status: 'cancelada' });
+      requisicoes.value = requisicoes.value.filter(
+        r => r.id_requisicao !== requisicaoSelecionada.value?.id_requisicao
+      );
+      showNotification('Sucesso', `Requisição ${requisicaoSelecionada.value.numero_requisicao} cancelada com sucesso.`);
     } catch (error: any) {
-      alert(`Erro ao cancelar requisição: ${error.message}`);
+      showNotification('Erro', `Erro ao cancelar requisição: ${error.message}`);
     } finally {
       closeCancelarPopup();
     }

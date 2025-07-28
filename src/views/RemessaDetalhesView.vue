@@ -53,16 +53,23 @@
     </footer>
     </div>
     </main>
+    <NotificationPopUp
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 // O script permanece o mesmo
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
 import { obterRequisicaoPorId, atualizarRequisicao } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -70,13 +77,29 @@ const requisicao = ref<IRequisicoes | null>(null);
 const loading = ref(true);
 const isSaving = ref(false);
 
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 onMounted(async () => {
   const requisicaoId = route.params.id as string;
   try {
     requisicao.value = await obterRequisicaoPorId(requisicaoId);
   } catch (error) {
     console.error("Erro ao buscar dados da requisição para remessa:", error);
-    alert("Não foi possível carregar os dados da requisição.");
+    showNotification('Erro', "Não foi possível carregar os dados da requisição.");
   } finally {
     loading.value = false;
   }
@@ -87,11 +110,11 @@ async function finalizarRequisicao() {
   isSaving.value = true;
   try {
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'concluida' });
-    alert(`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
+    showNotification('Erro',`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
     router.push({ name: 'Monitoramento' }); 
   } catch (error) {
     console.error("Erro ao finalizar requisição:", error);
-    alert("Não foi possível finalizar a requisição.");
+    showNotification('Erro',"Não foi possível finalizar a requisição.");
   } finally {
     isSaving.value = false;
   }

@@ -52,21 +52,44 @@
     </footer>
     </div>
     </main>
+    <NotificationPopUp
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
 import { obterRequisicaoPorId, atualizarRequisicao } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const route = useRoute();
 const router = useRouter();
 const requisicao = ref<IRequisicoes | null>(null);
 const loading = ref(true);
 const isSaving = ref(false);
+
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
 
 onMounted(async () => {
   const requisicaoId = route.params.id as string;
@@ -79,7 +102,7 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error("Erro ao buscar dados da requisição para conferência:", error);
-    alert("Não foi possível carregar os dados da requisição.");
+     showNotification('Erro',"Não foi possível carregar os dados da requisição.");
   } finally {
     loading.value = false;
   }
@@ -100,7 +123,7 @@ async function efetivarConferencia() {
     router.push({ name: 'Embalagem' });
   } catch (error) {
     console.error("Erro ao efetivar conferência:", error);
-    alert("Não foi possível efetivar a conferência.");
+     showNotification('Erro', "Não foi possível efetivar a conferência.");
   } finally {
     isSaving.value = false;
   }

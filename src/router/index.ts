@@ -50,7 +50,7 @@ const router = createRouter({
     {
       path: '/separacao-detalhes/:id',
       name: 'SeparacaoDetalhes',
-      component: () => import('../views/SeparacaoDetalhesView.vue'),
+      component: () => import('../views/SeparaçãoDetalhesView.vue'),
       meta: { requiresAuth: true }
     },
     {
