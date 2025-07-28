@@ -3,7 +3,7 @@
     <div class="popup-content">
       <div class="popup-header">
         <h3>Detalhes da Requisição</h3>
-        <button @click="closePopup" class="button-secondary">Voltar para a Lista</button>
+        <button @click="closePopup" class="button-secondary">Voltar para a Lista de Atendimento</button>
       </div>
       <div class="details-grid">
         <div><strong>Data Requisição:</strong> {{ new Date(requisicao.data_requisicao).toLocaleDateString('pt-BR') }}</div>

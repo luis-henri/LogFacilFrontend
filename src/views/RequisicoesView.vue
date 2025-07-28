@@ -55,7 +55,7 @@
                   <div class="envio-cell">
                       <ArrowUpCircleIcon 
                         @click.stop="handleTogglePrioridade(req)" 
-                        :class="['icon-acao', { 'icon-prioridade-ativa': req.prioridade_requisicao }]" 
+                        :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]" 
                         title="Alternar Prioridade" 
                       />
                       <span v-if="req.tipo_envio" class="text-xs font-semibold">{{ req.tipo_envio.descricao_tipo_envio_requisicao }}</span>
@@ -79,7 +79,7 @@
                 class="button-primary"
                 :disabled="!temRequisicoesSelecionadas || isSaving"
             >
-                {{ isSaving ? 'Aguarde...' : 'Iniciar Separação' }}
+                {{ isSaving ? 'Aguarde...' : 'Enviar para Separação' }}
             </button>
         </footer>
       </div>
@@ -191,6 +191,7 @@ function toggleSelectAll(event: Event) {
 
 function toggleRowSelection(req: IRequisicoes) { req.checked = !req.checked; }
 
+
 async function iniciarSeparacaoEmMassa() {
     const selecionadas = requisicoes.value.filter(req => req.checked);
     if (selecionadas.length === 0) {
@@ -200,12 +201,15 @@ async function iniciarSeparacaoEmMassa() {
     
     isSaving.value = true;
     try {
+        // ATUALIZADO: Muda o status para 'em-atendimento' (ID 2)
         const promessas = selecionadas.map(req => 
-            atualizarRequisicao(req.id_requisicao, { status: 'em-separacao' })
+            atualizarRequisicao(req.id_requisicao, { status: 'em-atendimento' })
         );
         await Promise.all(promessas);
-        await carregarDados();
+
         alert(`${selecionadas.length} requisição(ões) enviada(s) para separação.`);
+        // ATUALIZADO: Navega para a nova tela de lista de separação
+        router.push({ name: 'Separacao' });
     } catch (error) {
         console.error("Erro ao iniciar separação em massa:", error);
         alert("Ocorreu um erro ao enviar as requisições para separação.");
@@ -346,7 +350,7 @@ tbody tr:hover { background-color: #eef2f7; }
 .status-cancelada { background-color: #dc3545; }
 .no-data-message, .loading-message { text-align: center; padding: 20px; color: #6c757d; font-style: italic; }
 .acoes-cell, .envio-cell { display: flex; align-items: center; gap: 16px; justify-content: center; }
-.icon-acao { width: 22px; height: 22px; color: #4b5563; cursor: pointer; transition: color 0.2s; }
+.icon-acao, .icon-acao-prioridade { width: 22px; height: 22px; color: #4b5563; cursor: pointer; transition: color 0.2s; }
 .icon-acao:hover { color: #007bff; }
 .icon-cancelar:hover { color: #dc3545; }
 .icon-prioridade-ativa { color: #f59e0b; }

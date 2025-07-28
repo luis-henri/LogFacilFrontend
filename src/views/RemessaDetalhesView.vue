@@ -88,7 +88,7 @@ async function finalizarRequisicao() {
   try {
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'concluida' });
     alert(`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
-    router.push({ name: 'Monitoramento' });
+    router.push({ name: 'Monitoramento' }); 
   } catch (error) {
     console.error("Erro ao finalizar requisição:", error);
     alert("Não foi possível finalizar a requisição.");
