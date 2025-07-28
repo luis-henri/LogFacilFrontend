@@ -65,17 +65,25 @@
       :requisicao="requisicaoSelecionada" 
       @close="closeVisualizarItensPopup" 
     />
+
+    <NotificationPopUp
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import Header from '@/components/Header.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserCircleIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import VisualizarItensPopup from '../components/VisualizarItensPopup.vue';
 import { obterRequisicoesMonitoramento } from '../http/index';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);
@@ -84,6 +92,23 @@ const userName = ref('Usuário');
 const isDropdownOpen = ref(false);
 const showItensPopup = ref(false);
 const requisicaoSelecionada = ref<IRequisicoes | null>(null);
+
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 
 onMounted(async () => {
   const token = localStorage.getItem('user-token');
@@ -103,7 +128,7 @@ async function carregarDados() {
   try {
     requisicoes.value = await obterRequisicoesMonitoramento();
   } catch (error: any) {
-    alert(`Erro ao buscar dados de monitoramento: ${error.message}`);
+    showNotification('Erro', `Erro ao buscar dados de monitoramento: ${error.message}`);
   } finally {
     loading.value = false;
   }

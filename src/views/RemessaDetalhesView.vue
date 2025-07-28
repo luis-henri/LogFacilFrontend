@@ -110,7 +110,7 @@ async function finalizarRequisicao() {
   isSaving.value = true;
   try {
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'concluida' });
-    showNotification('Erro',`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
+    showNotification('Sucesso',`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
     router.push({ name: 'Monitoramento' }); 
   } catch (error) {
     console.error("Erro ao finalizar requisição:", error);
