@@ -42,7 +42,7 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/separacao/',
+      path: '/separacao',
       name: 'Separacao',
       component: () => import('../views/SeparacaoView.vue'),
       meta: { requiresAuth: true }
@@ -50,7 +50,7 @@ const router = createRouter({
     {
       path: '/separacao-detalhes/:id',
       name: 'SeparacaoDetalhes',
-      component: () => import('../views/SeparaçãoDetalhesView.vue'),
+      component: () => import('../views/SeparacaoDetalhesView.vue'),
       meta: { requiresAuth: true }
     },
     {
