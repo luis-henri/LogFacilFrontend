@@ -53,13 +53,13 @@
                 <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
                 <td data-label="Envio">
                   <div class="envio-cell">
-                      <ArrowUpCircleIcon 
-                        @click.stop="handleTogglePrioridade(req)" 
-                        :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]" 
-                        title="Alternar Prioridade" 
-                      />
-                      <span v-if="req.tipo_envio" class="text-xs font-semibold">{{ req.tipo_envio.descricao_tipo_envio_requisicao }}</span>
-                      <TruckIcon v-else @click.stop="openSelecionarEnvioPopup(req)" class="icon-acao" title="Selecionar Tipo de Envio" />
+                    <ArrowUpCircleIcon 
+                      @click.stop="handleTogglePrioridade(req)" 
+                      :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]" 
+                      title="Alternar Prioridade" 
+                    />
+                    <span v-if="req.tipo_envio" class="text-xs font-semibold">{{ req.tipo_envio.descricao_tipo_envio_requisicao }}</span>
+                    <TruckIcon v-else @click.stop="openSelecionarEnvioPopup(req)" class="icon-acao" title="Selecionar Tipo de Envio" />
                   </div>
                 </td>
                 <td data-label="Ações">
@@ -250,7 +250,7 @@ async function handleTogglePrioridade(req: IRequisicoes) {
             requisicoes.value[index].prioridade_requisicao = novoStatusPrioridade;
         } catch (error) {
             console.error("Erro ao atualizar prioridade:", error);
-             showNotification('Erro',"Não foi possível alterar a prioridade.");
+              showNotification('Erro',"Não foi possível alterar a prioridade.");
         }
     }
 }
