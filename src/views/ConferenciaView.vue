@@ -59,7 +59,7 @@ const loadingStates = ref<{ [key: number]: boolean }>({});
 
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-separacao');
+    requisicoes.value = await obterRequisicoesPorStatus('em-conferencia');
   } catch (error) {
     console.error("Erro ao buscar requisições para conferência:", error);
   }
