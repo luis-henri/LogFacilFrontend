@@ -35,7 +35,7 @@
                       class="input-qty"
                       v-model.number="item.quantidade_atendida_item_requisicao"
                       :max="item.quantidade_solicitada_item_requisicao"
-                      min="0"
+                      placeholder="0"
                     >
                   </td>
                 </tr>

@@ -327,6 +327,7 @@ function getStatusClass(situacao: string): string {
   }
   return `status-${statusNormalizado}`;
 }
+
 </script>
 
 <style scoped>
