@@ -31,7 +31,7 @@
                 <th>Número</th>
                 <th>Situação</th>
                 <th>Observação</th>
-                <th>Envio</th>
+                <th>Prioridade - Envio</th>
                 <th>Ações</th>
               </tr>
             </thead>
