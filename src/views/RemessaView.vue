@@ -60,7 +60,7 @@ const requisicoes = ref<IRequisicoes[]>([]);
 
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-embalagem');
+    requisicoes.value = await obterRequisicoesPorStatus('em-expedicao');
   } catch (error) {
     console.error("Erro ao buscar requisições para remessa:", error);
   }

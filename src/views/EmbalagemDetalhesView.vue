@@ -143,7 +143,7 @@ async function efetivarPacote() {
   isSaving.value = true;
   try {
     const dadosParaAtualizar = {
-      status: 'em-embalagem',
+      status: 'em-expedicao',
       volumes: requisicao.value.volumes.map(v => ({
           comprimento: v.comprimento || 0,
           largura: v.largura || 0,

@@ -62,7 +62,7 @@ const loading = ref(true);
 
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-atendimento');
+    requisicoes.value = await obterRequisicoesPorStatus('em-separacao');
   } catch (error) {
     console.error("Erro ao buscar requisições para separação:", error);
   } finally {

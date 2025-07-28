@@ -114,7 +114,7 @@ async function efetivarSeparacao() {
   isSaving.value = true;
   try {
     const dadosParaAtualizar = {
-      status: 'em-separacao',
+      status: 'em-conferencia',
       itens: requisicao.value.itens.map(item => ({
         id_item_requisicao: item.id_item_requisicao,
         quantidade_atendida_item_requisicao: item.quantidade_atendida_item_requisicao || 0

@@ -56,7 +56,7 @@ const requisicoes = ref<IRequisicoes[]>([]);
 
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-conferencia');
+    requisicoes.value = await obterRequisicoesPorStatus('em-embalagem');
   } catch (error) {
     console.error("Erro ao buscar requisições para embalagem:", error);
   }
