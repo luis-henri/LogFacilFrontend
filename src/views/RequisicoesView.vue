@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gray-100">
     <Header />
-    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+    <main class="flex-grow">
       <div class="page-container">
         <div class="header-container">
           <div class="header-left">
@@ -21,7 +21,6 @@
 
         <div class="table-scroll-container">
           <div v-if="loading" class="loading-message">Carregando requisições...</div>
-          <!-- A classe 'responsive-table' foi adicionada aqui -->
           <table v-else class="responsive-table">
             <thead>
               <tr>
@@ -31,7 +30,7 @@
                 <th>Número</th>
                 <th>Situação</th>
                 <th>Observação</th>
-                <th>Prior - Envio</th>
+                <th>Envio</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -40,7 +39,6 @@
                 <td colspan="8" class="no-data-message">Nenhuma requisição encontrada.</td>
               </tr>
               <tr v-for="req in sortedRequisicoes" :key="req.id_requisicao" :class="{ 'row-checked': req.checked }" @click="toggleRowSelection(req)">
-                <!-- Os atributos 'data-label' foram adicionados a cada célula -->
                 <td data-label="Selecionar"><input type="checkbox" v-model="req.checked" @click.stop /></td>
                 <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
                 <td data-label="UR">{{ req.requisitante_requisicao }}</td>
@@ -53,19 +51,26 @@
                 <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
                 <td data-label="Envio">
                   <div class="envio-cell">
-                    <ArrowUpCircleIcon 
-                      @click.stop="handleTogglePrioridade(req)" 
-                      :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]" 
-                      title="Alternar Prioridade" 
-                    />
+                    <div class="tooltip-container" :data-tooltip="req.prioridade_requisicao ? 'Desmarcar Prioridade' : 'Marcar como Prioritário'">
+                      <ArrowUpCircleIcon 
+                        @click.stop="handleTogglePrioridade(req)" 
+                        :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]"
+                      />
+                    </div>
                     <span v-if="req.tipo_envio" class="text-xs font-semibold">{{ req.tipo_envio.descricao_tipo_envio_requisicao }}</span>
-                    <TruckIcon v-else @click.stop="openSelecionarEnvioPopup(req)" class="icon-acao" title="Selecionar Tipo de Envio" />
+                    <div v-else class="tooltip-container" data-tooltip="Selecionar Tipo de Envio">
+                      <TruckIcon @click.stop="openSelecionarEnvioPopup(req)" class="icon-acao" />
+                    </div>
                   </div>
                 </td>
                 <td data-label="Ações">
                   <div class="acoes-cell">
-                    <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" title="Visualizar Itens" />
-                    <TrashIcon @click.stop="openCancelarPopup(req)" class="icon-acao icon-cancelar" title="Cancelar Requisição" />
+                    <div class="tooltip-container" data-tooltip="Visualizar Itens">
+                      <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" />
+                    </div>
+                    <div class="tooltip-container" data-tooltip="Cancelar Requisição">
+                      <TrashIcon @click.stop="openCancelarPopup(req)" class="icon-acao icon-cancelar" />
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -141,24 +146,27 @@ const showCancelarPopup = ref(false);
 const requisicaoSelecionada = ref<IRequisicoes | null>(null);
 const tiposEnvio = ref<any[]>([]);
 
-// NOVO ESTADO PARA O POPUP DE NOTIFICAÇÃO
 const notification = reactive({
     visible: false,
     title: '',
-    message: ''
+    message: '',
+    onCloseCallback: null as (() => void) | null
 });
 
-// NOVA FUNÇÃO PARA EXIBIR O POPUP
-function showNotification(title: string, message: string) {
+function showNotification(title: string, message: string, callback: (() => void) | null = null) {
     notification.title = title;
     notification.message = message;
+    notification.onCloseCallback = callback;
     notification.visible = true;
 }
 
 function closeNotification() {
     notification.visible = false;
+    if (notification.onCloseCallback) {
+        notification.onCloseCallback();
+    }
+    notification.onCloseCallback = null;
 }
-
 
 const sortedRequisicoes = computed(() => {
   return [...requisicoes.value].sort((a, b) => {
@@ -232,8 +240,15 @@ async function iniciarSeparacaoEmMassa() {
             atualizarRequisicao(req.id_requisicao, { status: 'em-separacao' })
         );
         await Promise.all(promessas);
-        await carregarDados();
-        showNotification('Sucesso', `${selecionadas.length} requisição(ões) enviada(s) para separação.`);
+
+        showNotification(
+            'Sucesso', 
+            `${selecionadas.length} requisição(ões) enviada(s) para separação.`,
+            () => {
+                router.push({ name: 'Separacao' });
+            }
+        );
+
     } catch (error) {
         console.error("Erro ao iniciar separação em massa:", error);
         showNotification('Erro', "Ocorreu um erro ao enviar as requisições para separação.");
@@ -331,27 +346,26 @@ function getStatusClass(situacao: string): string {
 </script>
 
 <style scoped>
-/* Estilos para o scroll interno */
-.page-container { 
+/* Estilos existentes */
+.page-container {
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 8rem); 
-  background-color: #fff; 
-  padding: 20px; 
-  border-radius: 8px; 
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+  flex-grow: 1;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 .header-container { flex-shrink: 0; }
 .footer-actions { flex-shrink: 0; }
-
 .table-scroll-container {
   flex-grow: 1;
   overflow-y: auto;
   border: 1px solid #e9ecef;
   border-radius: 8px;
 }
-
-/* Estilos existentes */
 .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .header-left { display: flex; flex-direction: column; align-items: flex-start; }
 .user-info-wrapper { position: relative; margin-bottom: 8px; }
@@ -388,40 +402,89 @@ tbody tr:hover { background-color: #eef2f7; }
 
 /* REGRAS DE RESPONSIVIDADE */
 @media (max-width: 768px) {
-  .responsive-table thead {
+  .responsive-table thead { display: none; }
+  .responsive-table tr { display: block; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .responsive-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; text-align: right; border-bottom: 1px solid #eee; }
+  .responsive-table td:last-child { border-bottom: none; }
+  .responsive-table td::before { content: attr(data-label); font-weight: 600; text-align: left; margin-right: 1rem; color: #374151; }
+  .responsive-table td[data-label="Selecionar"]::before { display: none; }
+  .responsive-table td[data-label="Ações"] { justify-content: center; }
+
+  /* --- INÍCIO DAS NOVAS REGRAS PARA TOOLTIPS NO MOBILE --- */
+  /* Primeiro, desabilitamos o tooltip que aparece ao passar o mouse, pois não funciona no celular. */
+  .tooltip-container:hover::before,
+  .tooltip-container:hover::after,
+  .tooltip-container::before {
     display: none;
   }
-  .responsive-table tr {
-    display: block;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .responsive-table td {
+  /* Transforma cada container de ícone em um bloco vertical (ícone + texto). */
+  .tooltip-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 0.75rem 1rem;
-    text-align: right;
-    border-bottom: 1px solid #eee;
+    gap: 2px; /* Espaço pequeno entre o ícone e o texto. */
   }
-  .responsive-table td:last-child {
-    border-bottom: none;
+  /* Usa o pseudo-elemento 'after' para criar o rótulo de texto que ficará sempre visível no mobile. */
+  .tooltip-container::after {
+    content: attr(data-tooltip); /* Pega o texto do atributo 'data-tooltip'. */
+    /* Estilos do rótulo de texto. */
+    font-size: 0.65rem; /* Fonte bem pequena para não poluir. */
+    color: #4b5563;
+    font-weight: 500;
+    /* Reseta os estilos do tooltip de hover para garantir visibilidade. */
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    background: none;
+    padding: 0;
+    margin: 0;
+    pointer-events: auto;
+    border-radius: 0; /* Reseta o border-radius caso tenha herdado. */
   }
-  .responsive-table td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    text-align: left;
-    margin-right: 1rem;
-    color: #374151;
-  }
-  /* Esconde o rótulo da célula do checkbox */
-  .responsive-table td[data-label="Selecionar"]::before {
-      display: none;
-  }
-  .responsive-table td[data-label="Ações"] {
-      justify-content: center;
-  }
+  /* --- FIM DAS NOVAS REGRAS --- */
+} 
+@media (min-width: 1024px) {
+  .page-container { padding: 2rem; }
 }
+
+.tooltip-container {
+  position: relative;
+  display: inline-flex;
+}
+.tooltip-container::before,
+.tooltip-container::after {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+.tooltip-container::after {
+  content: '';
+  background-color: #374151;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.tooltip-container::before {
+  content: attr(data-tooltip);
+  min-width: max-content;
+  padding: 4px 8px;
+  background-color: #374151;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 4px;
+}
+.tooltip-container:hover::before,
+.tooltip-container:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
 </style>

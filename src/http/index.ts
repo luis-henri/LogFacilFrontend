@@ -1,7 +1,7 @@
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import type { IUsuario } from '../interfaces/IUsuario';
 
-const API_BASE_URL = 'https://logfacilbackend.onrender.com/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('user-token');

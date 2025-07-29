@@ -27,7 +27,7 @@
       </button>
 
         <button @click="goToRequisicoes" class="button-tertiary" :disabled="isLoading">
-        Voltar para Requisições
+        Ir para Requisições
       </button>
     </div>
   </div>
