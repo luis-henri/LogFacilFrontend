@@ -68,9 +68,9 @@
                     <div class="tooltip-container" data-tooltip="Visualizar Itens">
                       <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" />
                     </div>
-                    
-                      <TrashIcon @click.stop="openCancelarPopup(req)" class="icon-acao icon-cancelar" />
-                    
+                    <div class="tooltip-container" data-tooltip="Cancelar Requisição"> 
+                    <TrashIcon @click.stop="openCancelarPopup(req)" class="icon-acao icon-cancelar" />
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -369,6 +369,24 @@ flex-grow: 1;
   min-height: 0;
   max-height: 60vh;
   position: relative;
+}
+.table-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .header-left { display: flex; flex-direction: column; align-items: flex-start; }
