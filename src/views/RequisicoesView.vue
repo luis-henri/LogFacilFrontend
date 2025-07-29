@@ -16,7 +16,6 @@
             </div>
             <h2 class="container-title">Requisições - Atendimento</h2>
           </div>
-          <button @click="goToImportacao" class="button-secondary-nav">Voltar para Importação</button>
         </div>
 
         <div class="table-scroll-container">
@@ -330,9 +329,6 @@ function toggleDropdown() { isDropdownOpen.value = !isDropdownOpen.value; }
 function handleLogout() {
   localStorage.removeItem('user-token');
   router.push({ name: 'Login' });
-}
-function goToImportacao() {
-    router.push({ name: 'Importacao' });
 }
 function getStatusClass(situacao: string): string {
   if (!situacao) return '';
