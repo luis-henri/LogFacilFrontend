@@ -68,9 +68,9 @@
                     <div class="tooltip-container" data-tooltip="Visualizar Itens">
                       <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" />
                     </div>
-                    <div class="tooltip-container" data-tooltip="Cancelar Requisição">
+                    
                       <TrashIcon @click.stop="openCancelarPopup(req)" class="icon-acao icon-cancelar" />
-                    </div>
+                    
                   </div>
                 </td>
               </tr>
@@ -361,10 +361,14 @@ function getStatusClass(situacao: string): string {
 .header-container { flex-shrink: 0; }
 .footer-actions { flex-shrink: 0; }
 .table-scroll-container {
-  flex-grow: 1;
+flex-grow: 1;
   overflow-y: auto;
+  overflow-x: auto; 
   border: 1px solid #e9ecef;
   border-radius: 8px;
+  min-height: 0;
+  max-height: 60vh;
+  position: relative;
 }
 .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .header-left { display: flex; flex-direction: column; align-items: flex-start; }
