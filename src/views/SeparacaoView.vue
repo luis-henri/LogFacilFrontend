@@ -6,7 +6,7 @@
         <div class="header-container">
           <h2 class="container-title">Requisições - Separação</h2>
         </div>
-        <div class="content-wrapper">
+        <div class="table-scroll-container">
           <div class="table-container responsive-table">
             <table>
               <thead>
@@ -35,7 +35,7 @@
                   </td>
                   <td data-label="Ações" class="text-center">
                     <button @click="iniciarSeparacao(req)" class="button-primary text-xs">
-                      Iniciar Separação
+                      iniciar Separação
                     </button>
                   </td>
                 </tr>
@@ -45,6 +45,11 @@
         </div>
       </div>
     </main>
+    <NotificationPopUp 
+        :visible="notification.visible"
+        :title="notification.title"
+        :message="notification.message"
+        @close="closeNotification"/>
   </div>
 </template>
 
@@ -52,17 +57,34 @@
 import { ref, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
-import { obterRequisicoesPorStatus } from '../http';
+import { obterRequisicoesPorStatus, atualizarRequisicao } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import { ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);
 const loading = ref(true);
 
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-separacao');
+    requisicoes.value = await obterRequisicoesPorStatus('enviado-para-separacao');
   } catch (error) {
     console.error("Erro ao buscar requisições para separação:", error);
   } finally {
@@ -70,15 +92,49 @@ onMounted(async () => {
   }
 });
 
-function iniciarSeparacao(req: IRequisicoes) {
+async function iniciarSeparacao(req: IRequisicoes) {
+  try {
   // Navega para a tela de detalhes da separação
+  await atualizarRequisicao(req.id_requisicao, { status: 'em-separacao' });
   router.push({ name: 'SeparacaoDetalhes', params: { id: req.id_requisicao } });
+  }catch (error) {
+    console.error("Erro ao iniciar separação:", error);
+    showNotification('Erro', "Não foi possível iniciar a separação");
+  }
 }
 </script>
 
 <style scoped>
 /* Estilos consistentes com as outras telas de lista */
 .page-container { width: 100%; display: flex; flex-direction: column; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.table-scroll-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: auto; 
+  border: 1px solid #e9ecef;
+  border-radius: 8;
+  min-height: 0;
+  max-height: 60vh;
+  position: relative;
+}
+.table-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
 .header-container { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
 .container-title { font-weight: bold; font-size: 1.5em; color: #153462; }
 .content-wrapper { flex-grow: 1; overflow-y: auto; }

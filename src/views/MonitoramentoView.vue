@@ -166,9 +166,13 @@ function getStatusClass(situacao: string): string {
     'pendente': 'status-pendente',
     'em-atendimento': 'status-em-atendimento',
     'em-separacao': 'status-em-separacao',
+    'enviado-para-separacao' : 'status-enviado-para-separacao',
     'em-conferencia': 'status-em-conferencia',
+    'enviado-para-conferencia' : 'status-enviado-para-conferencia',
     'em-embalagem': 'status-em-embalagem',
+    'enviado-para-embalagem' : 'status-enviado-para-embalagem',
     'em-expedicao': 'status-em-expedicao',
+    'enviado-para-expedicao' : 'status-enviado-para-expedicao',
     'concluida': 'status-concluida',
     'cancelada': 'status-cancelada'
   };
@@ -219,10 +223,10 @@ tbody tr:hover { background-color: #eef2f7; }
 .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: white; }
 .status-pendente { background-color: #6b7280; }
 .status-em-atendimento { background-color: #f59e0b; }
-.status-em-separacao { background-color: #3b82f6; }
-.status-em-conferencia { background-color: #ea580c; }
-.status-em-embalagem { background-color: #14b8a6; }
-.status-em-expedicao { background-color: #6366f1; }
+.status-em-separacao, .status-enviado-para-separacao { background-color: #3b82f6; }
+.status-em-conferencia, .status-enviado-para-conferencia { background-color: #ea580c; } 
+.status-em-embalagem, .status-enviado-para-embalagem { background-color: #14b8a6; }
+.status-em-expedicao, .status-enviado-para-expedicao { background-color: #6366f1; }
 .status-concluida { background-color: #22c55e; }
 .status-cancelada { background-color: #ef4444; }
 .no-data-message, .loading-message { text-align: center; padding: 20px; color: #6c757d; font-style: italic; }

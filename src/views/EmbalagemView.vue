@@ -40,30 +40,59 @@
     </div>
     </div>
     </main>
+    <NotificationPopUp
+    :visible="notification.visible"
+    :title="notification.title"
+    :message="notification.message"
+    @close="closeNotification" 
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
-import { obterRequisicoesPorStatus } from '../http';
+import { atualizarRequisicao, obterRequisicoesPorStatus } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import { ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);
 
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-embalagem');
+    requisicoes.value = await obterRequisicoesPorStatus('enviado-para-embalagem');
   } catch (error) {
     console.error("Erro ao buscar requisições para embalagem:", error);
   }
 });
 
-function iniciarEmbalagem(req: IRequisicoes) {
-  router.push({ name: 'EmbalagemDetalhes', params: { id: req.id_requisicao } });
+async function iniciarEmbalagem(req: IRequisicoes) {
+  try {
+    await atualizarRequisicao(req.id_requisicao, { status: 'em-embalagem' })
+    router.push({ name: 'EmbalagemDetalhes', params: { id: req.id_requisicao } });
+  } catch (error) {
+    console.error("Erro ao iniciar conferência da embalagem", error);
+    showNotification('Erro', "Não foi possível inicar a conferência")
+  }
 }
 </script>
 

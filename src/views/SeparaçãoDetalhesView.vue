@@ -98,7 +98,7 @@ onMounted(async () => {
     requisicao.value = await obterRequisicaoPorId(requisicaoId);
     if (requisicao.value) {
         requisicao.value.itens.forEach(item => {
-            item.quantidade_atendida_item_requisicao = 0;
+            item.quantidade_atendida_item_requisicao = null;
         });
     }
   } catch (error) {
@@ -114,7 +114,7 @@ async function efetivarSeparacao() {
   isSaving.value = true;
   try {
     const dadosParaAtualizar = {
-      status: 'em-conferencia',
+      status: 'enviado-para-conferencia-separacao',
       itens: requisicao.value.itens.map(item => ({
         id_item_requisicao: item.id_item_requisicao,
         quantidade_atendida_item_requisicao: item.quantidade_atendida_item_requisicao || 0

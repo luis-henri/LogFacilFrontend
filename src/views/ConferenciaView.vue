@@ -42,31 +42,60 @@
     </div>
     </div>
     </main>
+    <NotificationPopUp 
+    :visible="notification.visible"
+    :title="notification.title"
+    :message="notification.message"
+    @close="closeNotification"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
-import { obterRequisicoesPorStatus } from '../http';
+import { atualizarRequisicao, obterRequisicoesPorStatus } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import { ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
+import NotificationPopUp from '@/components/NotificationPopUp.vue';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);
 const loadingStates = ref<{ [key: number]: boolean }>({});
 
+const notification = reactive({
+    visible: false,
+    title: '',
+    message: ''
+});
+
+function showNotification(title: string, message: string){
+    notification.title = title;
+    notification.message = message;
+    notification.visible = true;
+}
+
+function closeNotification() {
+    notification.visible = false;
+}
+
 onMounted(async () => {
   try {
-    requisicoes.value = await obterRequisicoesPorStatus('em-conferencia');
+    requisicoes.value = await obterRequisicoesPorStatus('enviado-para-conferencia-separacao');
   } catch (error) {
     console.error("Erro ao buscar requisições para conferência:", error);
   }
 });
 
-function iniciarConferencia(req: IRequisicoes) {
-  router.push({ name: 'ConferenciaDetalhes', params: { id: req.id_requisicao } });
+async function iniciarConferencia(req: IRequisicoes) {
+  try {
+    await atualizarRequisicao(req.id_requisicao, { status: 'em-conferencia-separacao' });
+    router.push({ name: 'ConferenciaDetalhes', params: { id: req.id_requisicao } });
+  }catch (error) {
+    console.error("Erro ao iniciar Conferência:", error);
+    showNotification('Erro', "Nâo foi possível inicar a conferência")
+  }
 }
 </script>
 

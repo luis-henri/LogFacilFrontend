@@ -236,7 +236,7 @@ async function iniciarSeparacaoEmMassa() {
     isSaving.value = true;
     try {
         const promessas = selecionadas.map(req => 
-            atualizarRequisicao(req.id_requisicao, { status: 'em-separacao' })
+            atualizarRequisicao(req.id_requisicao, { status: 'enviado-para-separacao' })
         );
         await Promise.all(promessas);
 
@@ -357,11 +357,11 @@ function getStatusClass(situacao: string): string {
 .header-container { flex-shrink: 0; }
 .footer-actions { flex-shrink: 0; }
 .table-scroll-container {
-flex-grow: 1;
+  flex-grow: 1;
   overflow-y: auto;
   overflow-x: auto; 
   border: 1px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: 8;
   min-height: 0;
   max-height: 60vh;
   position: relative;
