@@ -22,7 +22,8 @@ body {
 }
 #app-container {
   width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
+  min-height: 100vh;
+  height: 100%;
+  height: 100vh;
 }
 </style>

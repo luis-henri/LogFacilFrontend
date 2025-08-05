@@ -12,6 +12,7 @@
               </div>
               <div v-if="isDropdownOpen" class="dropdown-menu">
                 <button @click="handleLogout" class="dropdown-item">Sair</button>
+                <button @click="goUsers" class="gouser-item">Gerenciar Usuários</button>
               </div>
             </div>
             <h2 class="container-title">Requisições - Atendimento</h2>
@@ -330,6 +331,10 @@ function handleLogout() {
   localStorage.removeItem('user-token');
   router.push({ name: 'Login' });
 }
+function goUsers() {
+  router.push({ name: 'GerenciamentoUsuarios' })
+}
+
 function getStatusClass(situacao: string): string {
   if (!situacao) return '';
   const statusNormalizado = situacao.toLowerCase().replace(/\s+/g, '-');
@@ -392,9 +397,10 @@ function getStatusClass(situacao: string): string {
 .user-icon { width: 20px; height: 20px; color: #4b5563; margin-right: 8px; }
 .user-name { font-weight: 500; font-size: 0.9rem; color: #374151; }
 .container-title { font-weight: bold; font-size: 1.5em; color: #333; margin: 0; }
-.dropdown-menu { position: absolute; top: 100%; left: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 10; padding: 8px 0; min-width: 120px; margin-top: 4px; }
-.dropdown-item { display: block; width: 100%; text-align: left; padding: 8px 16px; font-size: 0.9rem; color: #374151; background: none; border: none; cursor: pointer; }
+.dropdown-menu { flex-direction: column; position: absolute; top: 100%; left: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 10; padding: 8px 0; min-width: 120px; margin-top: 4px; }
+.dropdown-item, .gouser-item { display: block; width: 100%; text-align: left; padding: 8px 16px; font-size: 0.9rem; color: #374151; background: none; border: none; cursor: pointer; }
 .dropdown-item:hover { background-color: #f3f4f6; }
+.gouser-item:hover { background-color: #f3f4f6; };
 .button-secondary-nav { padding: 10px 15px; background-color: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
 .button-secondary-nav:hover { background-color: #5a6268; }
 table { width: 100%; border-collapse: collapse; }
