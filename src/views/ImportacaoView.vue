@@ -1,36 +1,36 @@
 <template>
-    <div class="flex flex-col min-h-screen bg-gray-100">
-      <Header />
-      <div class="flex-grow p-4 sm:p-6 lg:p-8">
-    <div class="import-box">
-      <h2 class="title">Importação de Requisições</h2>
-      <p class="subtitle">Selecione o arquivo .txt para importar os dados para o sistema.</p>
-      
-      <div v-if="feedbackMessage" :class="['feedback-message', isError ? 'feedback-error' : 'feedback-success']">
-        {{ feedbackMessage }}
-      </div>
+  <div class="min-h-screen bg-gray-100 flex flex-col">
+    <div class="flex-grow p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div class="import-box">
+        <Header />
+        <h2 class="title">Importação de Requisições</h2>
+        <p class="subtitle">Selecione o arquivo .txt para importar os dados para o sistema.</p>
 
-      <input type="file" ref="fileInput" @change="handleFileSelected" accept=".txt" class="hidden-input">
-      
-      <button @click="triggerFileInput" class="button-select" :disabled="isLoading">
-        <ArrowUpTrayIcon class="icon" />
-        <span>Selecionar arquivo</span>
-      </button>
-      
-      <p v-if="fileName" class="file-name">Arquivo selecionado: <strong>{{ fileName }}</strong></p>
-      
-      <hr class="divider">
-      
-      <button @click="handleImport" :disabled="!selectedFile || isLoading" class="button-import">
-        <span v-if="isLoading">Importando...</span>
-        <span v-else>Confirmar Importação</span>
-      </button>
+        <div v-if="feedbackMessage" :class="['feedback-message', isError ? 'feedback-error' : 'feedback-success']">
+          {{ feedbackMessage }}
+        </div>
+
+        <input type="file" ref="fileInput" @change="handleFileSelected" accept=".txt" class="hidden-input">
+
+        <button @click="triggerFileInput" class="button-select" :disabled="isLoading">
+          <ArrowUpTrayIcon class="icon" />
+          <span>Selecionar arquivo</span>
+        </button>
+
+        <p v-if="fileName" class="file-name">Arquivo selecionado: <strong>{{ fileName }}</strong></p>
+
+        <hr class="divider">
+
+        <button @click="handleImport" :disabled="!selectedFile || isLoading" class="button-import">
+          <span v-if="isLoading">Importando...</span>
+          <span v-else>Confirmar Importação</span>
+        </button>
 
         <button @click="goToRequisicoes" class="button-tertiary" :disabled="isLoading">
-        Ir para Requisições
-      </button>
+          Ir para Requisições
+        </button>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -70,7 +70,7 @@ async function handleImport() {
     isError.value = true;
     return;
   }
-  
+
   isLoading.value = true;
   feedbackMessage.value = '';
   isError.value = false;
@@ -79,9 +79,9 @@ async function handleImport() {
     const response = await importarRequisicoes(selectedFile.value);
     feedbackMessage.value = response.message || 'Importação bem-sucedida!';
     isError.value = false;
-    
+
     setTimeout(() => {
-        router.push({ name: 'Requisicao' });
+      router.push({ name: 'Requisicao' });
     }, 2000);
 
   } catch (error: any) {
@@ -93,58 +93,160 @@ async function handleImport() {
 }
 
 function goToRequisicoes() {
-    router.push({ name: 'Requisicao' });
+  router.push({ name: 'Requisicao' });
 }
 </script>
 
 <style scoped>
-.import-box { 
-  background: white; 
-  padding: 40px; 
-  border-radius: 12px; 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-  text-align: center; 
-  width: 100%; 
-  max-width: 500px; 
+.import-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
-.title { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 8px; }
-.subtitle { color: #6b7280; margin-bottom: 24px; }
-.hidden-input { display: none; }
-.button-select { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; background-color: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: background-color 0.2s; }
-.button-select:hover:not(:disabled) { background-color: #2563eb; }
-.icon { width: 20px; height: 20px; }
-.file-name { 
-  margin-top: 16px; 
-  font-size: 0.9rem; 
-  color: #4b5563; 
-  word-break: break-all; /* Garante que nomes de arquivo longos não quebrem o layout */
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
 }
-.divider { border: none; border-top: 1px solid #e5e7eb; margin: 24px 0; }
-.button-import { width: 100%; padding: 12px; background-color: #16a34a; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: background-color 0.2s; margin-bottom: 1rem; }
-.button-import:hover:not(:disabled) { background-color: #15803d; }
-.button-import:disabled, .button-select:disabled { background-color: #d1d5db; cursor: not-allowed; }
-.feedback-message { padding: 12px; margin-bottom: 16px; border-radius: 8px; font-weight: 500; }
-.feedback-success { background-color: #dcfce7; color: #166534; }
-.feedback-error { background-color: #fee2e2; color: #991b1b; }
-.button-tertiary { width: 100%; padding: 12px; background-color: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: background-color 0.2s; }
-.button-tertiary:hover:not(:disabled) { background-color: #4b5563; }
-.button-tertiary:disabled { background-color: #d1d5db; cursor: not-allowed; }
+
+.subtitle {
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.button-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.button-select:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.file-name {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: #4b5563;
+  word-break: break-all;
+  /* Garante que nomes de arquivo longos não quebrem o layout */
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 24px 0;
+}
+
+.button-import {
+  width: 100%;
+  padding: 12px;
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  margin-bottom: 1rem;
+}
+
+.button-import:hover:not(:disabled) {
+  background-color: #15803d;
+}
+
+.button-import:disabled,
+.button-select:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.feedback-message {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.feedback-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.feedback-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.button-tertiary {
+  width: 100%;
+  padding: 12px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.button-tertiary:hover:not(:disabled) {
+  background-color: #4b5563;
+}
+
+.button-tertiary:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
 
 /* LÓGICA DE RESPONSIVIDADE ADICIONADA AQUI */
 @media (max-width: 640px) {
-    .import-box {
-        padding: 24px;
-    }
-    .title {
-        font-size: 1.25rem;
-    }
-    .subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 16px;
-    }
-    .button-select, .button-import, .button-tertiary {
-        font-size: 0.9rem;
-        padding: 10px 16px;
-    }
+  .import-box {
+    padding: 24px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .button-select,
+  .button-import,
+  .button-tertiary {
+    font-size: 0.9rem;
+    padding: 10px 16px;
+  }
 }
 </style>

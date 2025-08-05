@@ -9,7 +9,7 @@
         <CpfInput v-model="cpf">
           <!-- O ícone é passado para dentro do 'slot' do componente -->
           <UserCircleIcon class="icon"/>
-        </CpfInput>
+        </CpfInput> 
         </div>
         <div class="input-group">
           <input

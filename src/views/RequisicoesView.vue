@@ -13,6 +13,11 @@
               <div v-if="isDropdownOpen" class="dropdown-menu">
                 <button @click="handleLogout" class="dropdown-item">Sair</button>
                 <button @click="goUsers" class="gouser-item">Gerenciar Usuários</button>
+                <button @click="goMonitoramento" class="gouser-item">Monitoramento</button>
+                <button @click="goSeparacao" class="gouser-item">Separação</button>
+                <button @click="goConferencia" class="gouser-item">Conferência</button>
+                <button @click="goEmbalagem" class="gouser-item">Embalagem</button>
+                <button @click="goExpedicao" class="gouser-item">Expedição</button>
               </div>
             </div>
             <h2 class="container-title">Requisições - Atendimento</h2>
@@ -326,6 +331,7 @@ async function handleCancelarConfirm() {
   }
 }
 
+/*NaAVEGAÇÃO DE TELAS*/
 function toggleDropdown() { isDropdownOpen.value = !isDropdownOpen.value; }
 function handleLogout() {
   localStorage.removeItem('user-token');
@@ -333,6 +339,21 @@ function handleLogout() {
 }
 function goUsers() {
   router.push({ name: 'GerenciamentoUsuarios' })
+}
+function goMonitoramento() {
+  router.push({ name: 'Monitoramento' })
+}
+function goSeparacao() {
+  router.push({ name: 'Separacao' })
+}
+function goConferencia() {
+  router.push({ name: 'Conferencia' })
+}
+function goEmbalagem() {
+  router.push({ name: 'Embalagem' })
+}
+function goExpedicao() {
+  router.push({ name: 'Remessa' })
 }
 
 function getStatusClass(situacao: string): string {
