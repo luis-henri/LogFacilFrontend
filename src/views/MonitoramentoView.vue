@@ -13,6 +13,7 @@
               </div>
               <div v-if="isDropdownOpen" class="dropdown-menu">
                 <button @click="handleLogout" class="dropdown-item">Sair</button>
+                <button>Teste</button>
               </div>
             </div>
             <h2 class="container-title">Monitoramento de Requisições</h2>
@@ -50,7 +51,9 @@
                 <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
                 <td data-label="Ações">
                   <div class="acoes-cell">
-                    <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" title="Visualizar Itens" />
+                    <div class="tooltip-container" data-tooltip="Visualizar Itens">
+                      <EyeIcon @click.stop="openVisualizarItensPopup(req)" class="icon-acao" title="Visualizar Itens" />
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -234,6 +237,45 @@ tbody tr:hover { background-color: #eef2f7; }
 .icon-acao { width: 22px; height: 22px; color: #4b5563; cursor: pointer; transition: color 0.2s; }
 .icon-acao:hover { color: #007bff; }
 
+.tooltip-container {
+  position: relative;
+  display: inline-flex;
+}
+.tooltip-container::before,
+.tooltip-container::after {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+.tooltip-container::after {
+  content: '';
+  background-color: #374151;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.tooltip-container::before {
+  content: attr(data-tooltip);
+  min-width: max-content;
+  padding: 4px 8px;
+  background-color: #374151;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 4px;
+}
+.tooltip-container:hover::before,
+.tooltip-container:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* REGRAS DE RESPONSIVIDADE */
 @media (max-width: 768px) {
   .responsive-table thead {
@@ -270,6 +312,36 @@ tbody tr:hover { background-color: #eef2f7; }
   .header-container {
     flex-direction: column;
     align-items: stretch;
+  }
+  .tooltip-container:hover::before,
+  .tooltip-container:hover::after,
+  .tooltip-container::before {
+    display: none;
+  }
+  /* Transforma cada container de ícone em um bloco vertical (ícone + texto). */
+  .tooltip-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px; /* Espaço pequeno entre o ícone e o texto. */
+  }
+  /* Usa o pseudo-elemento 'after' para criar o rótulo de texto que ficará sempre visível no mobile. */
+  .tooltip-container::after {
+    content: attr(data-tooltip); /* Pega o texto do atributo 'data-tooltip'. */
+    /* Estilos do rótulo de texto. */
+    font-size: 0.65rem; /* Fonte bem pequena para não poluir. */
+    color: #4b5563;
+    font-weight: 500;
+    /* Reseta os estilos do tooltip de hover para garantir visibilidade. */
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    background: none;
+    padding: 0;
+    margin: 0;
+    pointer-events: auto;
+    border-radius: 0; /* Reseta o border-radius caso tenha herdado. */
   }
 }
 </style>

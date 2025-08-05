@@ -55,7 +55,7 @@
         </table>
       </div>
     </div>
-    <div v-if="loading" class="loading-message">A carregar detalhes da embalagem...</div>
+    <div v-if="loading" class="loading-message">Carregando detalhes da embalagem...</div>
     
     <footer class="footer-actions">
         <button @click="goBack" class="button-secondary">Voltar</button>

@@ -43,7 +43,7 @@
         </table>
       </div>
     </div>
-    <div v-if="loading" class="loading-message">A carregar detalhes da remessa...</div>
+    <div v-if="loading" class="loading-message">Carregando detalhes da remessa...</div>
     
     <footer class="footer-actions">
         <button @click="goBack" class="button-secondary">Voltar</button>

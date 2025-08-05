@@ -5,16 +5,11 @@
       <h2>Faça seu login</h2>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <form @submit.prevent="handleLogin">
-        <div class="input-group">
-          <input
-            type="text"
-            inputmode="numeric"
-            v-model="cpf"
-            placeholder="CPF" 
-            maxlength="14"
-            required
-            />
-            <UserCircleIcon class="icon"/>
+        <div>
+        <CpfInput v-model="cpf">
+          <!-- O ícone é passado para dentro do 'slot' do componente -->
+          <UserCircleIcon class="icon"/>
+        </CpfInput>
         </div>
         <div class="input-group">
           <input
@@ -38,7 +33,8 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { loginUsuario } from '../http';
-import { UserCircleIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
+import CpfInput from '@/components/CpfInput.vue';
+import { EyeIcon, EyeSlashIcon, UserCircleIcon } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
 const cpf = ref('');
@@ -46,16 +42,6 @@ const password = ref('');
 const showPassword = ref(false);
 const isLoading = ref(false);
 const errorMessage = ref('');
-
-watch(cpf, (newValue) => {
-  const digits = newValue.replace(/\D/g, '');
-  let maskedValue = digits
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
-    .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
-  if (maskedValue.length > 14) maskedValue = maskedValue.slice(0, 14);
-  cpf.value = maskedValue;
-});
 
 function togglePassword() {
   showPassword.value = !showPassword.value;
@@ -109,6 +95,8 @@ async function handleLogin() {
 .login-box h2 { margin-bottom: 20px; color: #555; font-weight: normal; }
 .input-group { display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; padding: 0 8px; }
 .input-group input { flex: 1; border: none; outline: none; padding: 10px; background: transparent; }
+.icon { width: 20px; height: 20px; color: #666; }
+.clickable { cursor: pointer; }
 .button-primary { width: 100%; padding: 12px; background-color: #153462; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: 600; }
 .button-primary:hover:not(:disabled) { background-color: #112a4f; }
 .button-primary:disabled { background-color: #a0aec0; cursor: not-allowed; }

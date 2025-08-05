@@ -19,7 +19,7 @@
               </thead>
               <tbody>
                 <tr v-if="loading">
-                  <td colspan="4" class="text-center py-10 text-gray-500">A carregar requisições...</td>
+                  <td colspan="4" class="text-center py-10 text-gray-500">Carregando requisições...</td>
                 </tr>
                 <tr v-else-if="requisicoes.length === 0">
                   <td colspan="4" class="text-center py-10 text-gray-500">Nenhuma requisição aguardando separação.</td>
