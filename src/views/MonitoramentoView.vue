@@ -12,13 +12,17 @@
                 <span class="user-name">{{ userName }}</span>
               </div>
               <div v-if="isDropdownOpen" class="dropdown-menu">
-                <button @click="handleLogout" class="dropdown-item">Sair</button>
                 <button @click="goUsers" class="gouser-item">Gerenciar Usuários</button>
+                <button @click="goRequisicao" class="gouser-item">Requisição</button>
+                <button @click="goSeparacao" class="gouser-item">Separação</button>
+                <button @click="goConferencia" class="gouser-item">Conferência</button>
+                <button @click="goEmbalagem" class="gouser-item">Embalagem</button>
+                <button @click="goExpedicao" class="gouser-item">Expedição</button>
+                <button @click="handleLogout" class="dropdown-item">Sair</button>
               </div>
             </div>
             <h2 class="container-title">Monitoramento de Requisições</h2>
           </div>
-          <button @click="goToRequisicao" class="button-secondary-nav">Ir para Requisições</button>
         </div>
 
         <!-- NOVO CONTAINER PARA A BARRA DE ROLAGEM E RESPONSIVIDADE -->
@@ -155,9 +159,20 @@ function handleLogout() {
 function goUsers() {
   router.push({ name: 'GerenciamentoUsuarios' });
 }
-
-function goToRequisicao() {
+function goRequisicao() {
     router.push({ name: 'Requisicao' });
+}
+function goSeparacao() {
+  router.push({ name: 'Separacao' })
+}
+function goConferencia() {
+  router.push({ name: 'Conferencia' })
+}
+function goEmbalagem() {
+  router.push({ name: 'Embalagem' })
+}
+function goExpedicao() {
+  router.push({ name: 'Remessa' })
 }
 
 function getStatusClass(situacao: string): string {

@@ -11,13 +11,13 @@
                 <span class="user-name">{{ userName }}</span>
               </div>
               <div v-if="isDropdownOpen" class="dropdown-menu">
-                <button @click="handleLogout" class="dropdown-item">Sair</button>
                 <button @click="goUsers" class="gouser-item">Gerenciar Usuários</button>
                 <button @click="goMonitoramento" class="gouser-item">Monitoramento</button>
                 <button @click="goSeparacao" class="gouser-item">Separação</button>
                 <button @click="goConferencia" class="gouser-item">Conferência</button>
                 <button @click="goEmbalagem" class="gouser-item">Embalagem</button>
                 <button @click="goExpedicao" class="gouser-item">Expedição</button>
+                <button @click="handleLogout" class="dropdown-item">Sair</button>
               </div>
             </div>
             <h2 class="container-title">Requisições - Atendimento</h2>
