@@ -24,25 +24,30 @@
               <label for="edit-senha" class="form-label">Nova Senha (opcional)</label>
               <input type="password" id="edit-senha" v-model="usuarioEmEdicao.senha" class="form-input" placeholder="Deixe em branco para não alterar">
             </div>
+            <div class="form-group">
+              <label for="edit-perfil" class="form-label">Perfil</label>
+              <select id="edit-perfil" v-model="usuarioEmEdicao.perfilId" required class="form-input">
+                <option disabled value="">Selecione um perfil</option>
+                <option v-for="perfil in perfisDisponiveis" :key="perfil.id_perfil" :value="perfil.id_perfil">
+                  {{ perfil.nome_perfil }}
+                </option>
+              </select>
+            </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Status</label>
-          <div class="status-switch">
-            <button @click="usuarioEmEdicao.ativo = !usuarioEmEdicao.ativo" type="button" :class="{ 'is-active': usuarioEmEdicao.ativo }" class="switch-toggle">
-              <span class="switch-handle"/>
-            </button>
-            <span class="switch-label" :class="{ 'is-active': usuarioEmEdicao.ativo }">
-              {{ usuarioEmEdicao.ativo ? 'Ativo' : 'Inativo' }}
-            </span>
-          </div>
+             <label class="form-label">Status</label>
+             <div class="status-switch">
+               <button @click="usuarioEmEdicao.ativo = !usuarioEmEdicao.ativo" type="button" :class="{ 'is-active': usuarioEmEdicao.ativo }" class="switch-toggle">
+                 <span class="switch-handle"/>
+               </button>
+               <span class="switch-label" :class="{ 'is-active': usuarioEmEdicao.ativo }">
+                 {{ usuarioEmEdicao.ativo ? 'Ativo' : 'Inativo' }}
+               </span>
+             </div>
         </div>
         <div class="form-actions">
-          <button @click="cancelarEdicao" type="button" class="btn btn-secondary">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary">
-            Atualizar Usuário
-          </button>
+            <button @click="cancelarEdicao" type="button" class="btn btn-secondary">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Atualizar Usuário</button>
         </div>
       </form>
     </div>
@@ -132,13 +137,18 @@
               <label for="add-senha" class="form-label">Senha</label>
               <input type="password" id="add-senha" v-model="novoUsuarioForm.senha" required class="form-input" placeholder="********">
             </div>
+            <div class="form-group">
+              <label for="add-perfil" class="form-label">Perfil</label>
+              <select id="add-perfil" v-model="novoUsuarioForm.perfilId" required class="form-input">
+                <option disabled value="">Selecione um perfil</option>
+                <option v-for="perfil in perfisDisponiveis" :key="perfil.id_perfil" :value="perfil.id_perfil">
+                  {{ perfil.nome_perfil }}
+                </option>
+              </select>
+            </div>
             <div class="form-actions">
-              <button @click="fecharModalAdicionar" type="button" class="btn btn-secondary">
-                Cancelar
-              </button>
-              <button type="submit" class="btn btn-primary">
-                Salvar Usuário
-              </button>
+                <button @click="fecharModalAdicionar" type="button" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Usuário</button>
             </div>
           </form>
         </div>
@@ -155,20 +165,38 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted, reactive } from 'vue';
-import { obterUsuarios, registrarUsuario, atualizarUsuario as apiAtualizarUsuario } from '../http';
-import type { IUsuario } from '../interfaces/IUsuario';
+import { obterUsuarios, registrarUsuario, atualizarUsuario as apiAtualizarUsuario, obterPerfis } from '../http'; 
+import type { IUsuario, IPerfil } from '../interfaces/IUsuario';
 import NotificationPopUp from '@/components/NotificationPopUp.vue';
 import { isValidCpf } from '@/utils/validators';
 import Header from '@/components/Header.vue';
+
+// =======================================================================
+// CORREÇÃO: Definir tipos explícitos para os formulários
+// =======================================================================
+interface NovoUsuarioForm {
+  nome: string;
+  email: string;
+  cpf: string;
+  senha: string;
+  perfilId: number | ''; // Permite string vazia para o estado inicial
+}
+
+interface UsuarioEditForm extends IUsuario {
+    senha?: string;
+    ativo?: boolean;
+    perfilId?: number;
+}
 
 const modoAtual = ref('consultar');
 const mostrarModalAdicionar = ref(false);
 const usuarios = ref<IUsuario[]>([]);
 const loading = ref(true);
+const perfisDisponiveis = ref<IPerfil[]>([]);
 
 const filtros = ref({ nome: '', email: '', cpf: '' });
-const novoUsuarioForm = ref({ nome: '', email: '', cpf: '', senha: '' });
-const usuarioEmEdicao = ref<(IUsuario & { senha?: string; ativo?: boolean }) | null>(null);
+const novoUsuarioForm = ref<NovoUsuarioForm>({ nome: '', email: '', cpf: '', senha: '', perfilId: '' });
+const usuarioEmEdicao = ref<UsuarioEditForm | null>(null);
 
 const notification = reactive({
     visible: false,
@@ -186,10 +214,20 @@ function closeNotification() {
     notification.visible = false;
 }
 
-
 onMounted(async () => {
   await carregarUsuarios();
+  await carregarPerfis();
 });
+
+async function carregarPerfis() {
+    try {
+        const data = await obterPerfis();
+        perfisDisponiveis.value = data;
+    } catch (error) {
+        console.error("Erro ao carregar perfis:", error);
+        showNotification('Erro', "Não foi possível carregar a lista de perfis.");
+    }
+}
 
 async function carregarUsuarios() {
   loading.value = true;
@@ -205,12 +243,15 @@ async function carregarUsuarios() {
 
 const adicionarUsuario = async () => {
   if (!isValidCpf(novoUsuarioForm.value.cpf)) {
-    showNotification('Erro de Validação', 'O CPF inserido não é válido. Por favor, corrija.');
+    showNotification('Erro de Validação', 'O CPF inserido não é válido.');
     return;
   }
-
   if (!novoUsuarioForm.value.senha) {
     showNotification('Erro','O campo senha é obrigatório.');
+    return;
+  }
+  if (!novoUsuarioForm.value.perfilId) {
+    showNotification('Erro','A seleção de um perfil é obrigatória.');
     return;
   }
 
@@ -219,7 +260,8 @@ const adicionarUsuario = async () => {
       nome: novoUsuarioForm.value.nome,
       email: novoUsuarioForm.value.email,
       cpf: novoUsuarioForm.value.cpf.replace(/[.\-]/g, ''),
-      password: novoUsuarioForm.value.senha
+      password: novoUsuarioForm.value.senha,
+      perfilId: novoUsuarioForm.value.perfilId
     });
     showNotification('Sucesso','Usuário adicionado com sucesso!');
     fecharModalAdicionar();
@@ -233,7 +275,8 @@ const iniciarEdicao = (usuario: IUsuario) => {
   usuarioEmEdicao.value = {
     ...usuario,
     ativo: usuario.situacao.descricao_situacao_usuario === 'Ativo',
-    senha: ''
+    senha: '',
+    perfilId: usuario.perfis && usuario.perfis.length > 0 ? usuario.perfis[0].perfil.id_perfil : undefined
   };
   modoAtual.value = 'editar';
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -243,7 +286,11 @@ const handleAtualizarUsuario = async () => {
   if (!usuarioEmEdicao.value) return;
 
   if (!isValidCpf(usuarioEmEdicao.value.cpf_usuario)) {
-    showNotification('Erro de Validação', 'O CPF inserido não é válido. Por favor, corrija.');
+    showNotification('Erro de Validação', 'O CPF inserido não é válido.');
+    return;
+  }
+  if (!usuarioEmEdicao.value.perfilId) {
+    showNotification('Erro','A seleção de um perfil é obrigatória.');
     return;
   }
 
@@ -253,7 +300,8 @@ const handleAtualizarUsuario = async () => {
       email: usuarioEmEdicao.value.email_usuario,
       cpf: usuarioEmEdicao.value.cpf_usuario.replace(/[.\-]/g, ''),
       senha: usuarioEmEdicao.value.senha,
-      ativo: usuarioEmEdicao.value.ativo
+      ativo: usuarioEmEdicao.value.ativo,
+      perfilId: usuarioEmEdicao.value.perfilId
     });
     showNotification('Sucesso','Usuário atualizado com sucesso!');
     cancelarEdicao();
@@ -266,7 +314,7 @@ const handleAtualizarUsuario = async () => {
 const abrirModalAdicionar = () => { mostrarModalAdicionar.value = true; };
 const fecharModalAdicionar = () => {
   mostrarModalAdicionar.value = false;
-  novoUsuarioForm.value = { nome: '', email: '', cpf: '', senha: '' };
+  novoUsuarioForm.value = { nome: '', email: '', cpf: '', senha: '', perfilId: '' };
 };
 const cancelarEdicao = () => {
   usuarioEmEdicao.value = null;

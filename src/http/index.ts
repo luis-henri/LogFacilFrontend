@@ -141,3 +141,7 @@ export async function loginUsuario(credentials: object): Promise<LoginResponse> 
     body: JSON.stringify(credentials),
   });
 }
+
+export async function obterPerfis(): Promise<any[]> {
+    return apiFetch<any[]>('/users/perfis'); // Ajuste o endpoint se necessário
+}
