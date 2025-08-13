@@ -35,7 +35,7 @@
                 <th>Número</th>
                 <th>Situação</th>
                 <th>Observação</th>
-                <th>Envio</th>
+                <th>Prioridade - Envio</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -143,6 +143,7 @@ import NotificationPopUp from '@/components/NotificationPopUp.vue';
 import { obterRequisicoesPorStatus, atualizarRequisicao, obterTiposEnvio } from '../http/index';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import AcaoConcluidaPopup from '@/components/AcaoConcluidaPopup.vue';
+import 'animate.css';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);

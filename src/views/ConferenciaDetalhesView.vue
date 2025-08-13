@@ -4,7 +4,7 @@
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
         <div class="header-container">
-          <h2 class="container-title">Requisição - Conferência</h2>
+          <h2 class="container-title">Conferência - Separação</h2>
         </div>
 
     <div class="content-wrapper" v-if="!loading && requisicao">
@@ -145,8 +145,24 @@ async function efetivarConferencia() {
   }
 }
 
-function goBack() {
-  router.push({ name: 'Conferencia' });
+async function goBack() {
+  if (!requisicao.value) {
+    router.push({ name: 'Conferencia' });
+    return;
+  }
+  try {
+    // 1. Reverte o status da requisição para o estado anterior
+    await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'enviado-para-conferencia-separacao' });
+    
+    // 2. Navega de volta para a tela de lista
+    router.push({ name: 'Conferencia' });
+
+  } catch (error) {
+    console.error("Erro ao voltar e reverter status:", error);
+    showNotification('Erro', 'Ocorreu um erro ao tentar voltar.');
+    // Mesmo com erro, tenta navegar de volta
+    router.push({ name: 'Conferencia' });
+  }
 }
 </script>
 

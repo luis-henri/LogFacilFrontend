@@ -4,7 +4,7 @@
       <main class="flex-grow p-4 sm:p-6 lg:p-8">
         <div class="page-container">
           <div class="header-container">
-            <h2 class="container-title">Requisição - Expedição</h2>
+            <h2 class="container-title">Conferência - Remessa</h2>
           </div>
     <div class="content-wrapper" v-if="!loading && requisicao">
       <div class="details-section">
@@ -48,7 +48,7 @@
     <footer class="footer-actions">
         <button @click="goBack" class="button-secondary">Voltar</button>
         <button @click="finalizarRequisicao" class="button-primary" :disabled="isSaving">
-            {{ isSaving ? 'Aguarde...' : 'Finalizar Remessa' }}
+            {{ isSaving ? 'Aguarde...' : 'Efetiva Conferência' }}
         </button>
     </footer>
     </div>
@@ -136,8 +136,24 @@ async function finalizarRequisicao() {
   }
 }
 
-function goBack() {
-  router.push({ name: 'Remessa' });
+async function goBack() {
+  if (!requisicao.value) {
+    router.push({ name: 'Remessa' });
+    return;
+  }
+  try {
+    // 1. Reverte o status da requisição para o estado anterior
+    await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'enviado-para-conferencia-expedicao' });
+    
+    // 2. Navega de volta para a tela de lista
+    router.push({ name: 'Remessa' });
+
+  } catch (error) {
+    console.error("Erro ao voltar e reverter status:", error);
+    showNotification('Erro', 'Ocorreu um erro ao tentar voltar.');
+    // Mesmo com erro, tenta navegar de volta
+    router.push({ name: 'Remessa' });
+  }
 }
 </script>
 

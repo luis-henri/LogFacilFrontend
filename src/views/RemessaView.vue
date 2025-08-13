@@ -4,7 +4,7 @@
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
         <div class="header-container">
-          <h2 class="container-title">Requisição - Remessa</h2>
+          <h2 class="container-title">Conferência - Remessa</h2>
         </div>
       
       <div class="content-wrapper">
@@ -14,8 +14,9 @@
             <thead>
               <tr>
                 <th>Número</th>
+                <th>Data/Hora</th>
                 <th>Unidade</th>
-                <th>Envio</th>
+                <th>Prioridade - Envio</th>
                 <th class="text-center">Ações</th>
               </tr>
             </thead>
@@ -26,6 +27,7 @@
               <tr v-for="req in requisicoes" :key="req.id_requisicao">
                 <!-- ATRIBUTOS ADICIONADOS AQUI -->
                 <td data-label="Número">{{ req.numero_requisicao }}</td>
+                <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
                 <td data-label="Unidade">{{ req.requisitante_requisicao }}</td>
                 <td data-label="Envio">
                   <div class="envio-cell">

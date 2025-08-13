@@ -177,8 +177,24 @@ async function efetivarPacote() {
   }
 }
 
-function goBack() {
-  router.push({ name: 'Embalagem' });
+async function goBack() {
+  if (!requisicao.value) {
+    router.push({ name: 'Embalagem' });
+    return;
+  }
+  try {
+    // 1. Reverte o status da requisição para o estado anterior
+    await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'enviado-para-embalagem' });
+    
+    // 2. Navega de volta para a tela de lista
+    router.push({ name: 'Embalagem' });
+
+  } catch (error) {
+    console.error("Erro ao voltar e reverter status:", error);
+    showNotification('Erro', 'Ocorreu um erro ao tentar voltar.');
+    // Mesmo com erro, tenta navegar de volta
+    router.push({ name: 'Emabalagem' });
+  }
 }
 </script>
 

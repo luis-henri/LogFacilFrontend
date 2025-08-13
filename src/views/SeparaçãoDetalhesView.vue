@@ -146,8 +146,24 @@ async function efetivarSeparacao() {
 }
 
 // FUNÇÃO ATUALIZADA
-function goBack() {
-  router.push({ name: 'Separacao' }); // Volta para a nova tela de lista
+async function goBack() {
+  if (!requisicao.value) {
+    router.push({ name: 'Separacao' });
+    return;
+  }
+  try {
+    // 1. Reverte o status da requisição para o estado anterior
+    await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'enviado-para-separacao' });
+    
+    // 2. Navega de volta para a tela de lista
+    router.push({ name: 'Separacao' });
+
+  } catch (error) {
+    console.error("Erro ao voltar e reverter status:", error);
+    showNotification('Erro', 'Ocorreu um erro ao tentar voltar.');
+    // Mesmo com erro, tenta navegar de volta
+    router.push({ name: 'Separacao' });
+  }
 }
 </script>
 
