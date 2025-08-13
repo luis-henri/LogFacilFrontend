@@ -58,6 +58,11 @@
         :message="notification.message"
         @close="closeNotification"
     />
+    <AcaoConcluidaPopup
+      :visible="acaoConcluida.visible"
+      :title="acaoConcluida.title"
+      :message="acaoConcluida.message"
+    />
   </div>
 </template>
 
@@ -68,6 +73,7 @@ import Header from '../components/Header.vue';
 import { obterRequisicaoPorId, atualizarRequisicao } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import NotificationPopUp from '@/components/NotificationPopUp.vue';
+import AcaoConcluidaPopup from '@/components/AcaoConcluidaPopup.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -91,6 +97,11 @@ function closeNotification() {
     notification.visible = false;
 }
 
+const acaoConcluida = reactive({
+  visible: false,
+  title: '',
+  message: '',
+});
 
 onMounted(async () => {
   const requisicaoId = route.params.id as string;
@@ -121,7 +132,11 @@ async function efetivarSeparacao() {
       }))
     };
     await atualizarRequisicao(requisicao.value.id_requisicao, dadosParaAtualizar);
-    router.push({ name: 'Conferencia' });
+    
+    acaoConcluida.title = 'Separação Efetivada!';
+    acaoConcluida.message = 'A requisição foi enviada com sucesso para a próxima etapa de conferência.';
+    acaoConcluida.visible = true;
+
   } catch (error) {
     console.error("Erro", error);
     showNotification('Erro', "Não foi possível efetivar a separação.");

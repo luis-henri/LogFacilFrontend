@@ -30,12 +30,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'; 
 import { useRouter } from 'vue-router';
 import { loginUsuario } from '../http';
 import CpfInput from '@/components/CpfInput.vue';
 import { EyeIcon, EyeSlashIcon, UserCircleIcon } from '@heroicons/vue/24/outline';
 
+const authStore = useAuthStore();
 const router = useRouter();
 const cpf = ref('');
 const password = ref('');
@@ -55,19 +57,19 @@ async function handleLogin() {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    const response: any = await loginUsuario({ 
-      cpf: cpf.value.replace(/\D/g, ''),
+    // Chamar a action da store em vez da API diretamente
+    // A store agora cuida de tudo: chamada de API, guardar dados e redirecionar.
+    await authStore.login({ 
+      cpf: cpf.value.replace(/\D/g, ''), // Envia o CPF sem máscara
       password: password.value 
     });
     
-    if (response.token) {
-        localStorage.setItem('user-token', response.token);
-        router.push({ name: 'Importacao' });
-    } else {
-        throw new Error('Resposta inválida do servidor.');
-    }
+    // Se o login for bem-sucedido, a action da store já fará o redirecionamento.
+    // Não precisamos fazer mais nada aqui.
+
   } catch (error: any) {
-    errorMessage.value = error.message || 'Falha no login. Verifique as suas credenciais.';
+    // A action da store propaga o erro, então podemos apanhá-lo aqui para mostrar na UI.
+    errorMessage.value = error.response?.data?.message || 'Falha no login. Verifique as suas credenciais.';
   } finally {
     isLoading.value = false;
   }

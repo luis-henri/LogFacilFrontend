@@ -123,6 +123,11 @@
         :message="notification.message"
         @close="closeNotification"
     />
+    <AcaoConcluidaPopup
+      :visible="acaoConcluida.visible"
+      :title="acaoConcluida.title"
+      :message="acaoConcluida.message"
+    />
   </div>
 </template>
 
@@ -137,6 +142,7 @@ import ConfirmarCancelamentoPopup from '../components/ConfirmarCancelamentoPopup
 import NotificationPopUp from '@/components/NotificationPopUp.vue';
 import { obterRequisicoesPorStatus, atualizarRequisicao, obterTiposEnvio } from '../http/index';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
+import AcaoConcluidaPopup from '@/components/AcaoConcluidaPopup.vue';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);
@@ -172,6 +178,12 @@ function closeNotification() {
     }
     notification.onCloseCallback = null;
 }
+
+const acaoConcluida = reactive({
+  visible: false,
+  title: '',
+  message: '',
+});
 
 const sortedRequisicoes = computed(() => {
   return [...requisicoes.value].sort((a, b) => {
@@ -235,6 +247,7 @@ function toggleRowSelection(req: IRequisicoes) { req.checked = !req.checked; }
 async function iniciarSeparacaoEmMassa() {
     const selecionadas = requisicoes.value.filter(req => req.checked);
     if (selecionadas.length === 0) {
+        // A sua notificação de erro continua igual
         showNotification('Atenção', "Por favor, selecione pelo menos uma requisição para iniciar a separação.");
         return;
     }
@@ -246,13 +259,10 @@ async function iniciarSeparacaoEmMassa() {
         );
         await Promise.all(promessas);
 
-        showNotification(
-            'Sucesso', 
-            `${selecionadas.length} requisição(ões) enviada(s) para separação.`,
-            () => {
-                router.push({ name: 'Separacao' });
-            }
-        );
+        // Em vez de chamar a notificação simples, ativamos o novo popup
+        acaoConcluida.title = 'Sucesso!';
+        acaoConcluida.message = `${selecionadas.length} requisição(ões) enviada(s) para separação.`;
+        acaoConcluida.visible = true;
 
     } catch (error) {
         console.error("Erro ao iniciar separação em massa:", error);

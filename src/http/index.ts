@@ -1,17 +1,36 @@
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import type { IUsuario } from '../interfaces/IUsuario';
 
+interface Perfil {
+  id: number;
+  nome: string;
+}
+
+interface UserData {
+  id: number;
+  cpf: string;
+  email: string;
+  nome: string;
+  perfil: Perfil;
+}
+
+// CORREÇÃO APLICADA AQUI
+export interface LoginResponse {
+  message: string;
+  token: string;
+  user: UserData;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 console.log(`API sendo utilizada: ${API_BASE_URL}`); // Ótimo para debugar!
 
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('user-token');
+  const token = localStorage.getItem('token'); // CORREÇÃO: Usar a chave 'token' que você usa no auth.ts
   const headers = new Headers(options.headers || {});
 
-  // Não define Content-Type se for FormData (o browser faz isso automaticamente com o boundary correto)
   if (!(options.body instanceof FormData)) {
-      headers.append('Content-Type', 'application/json');
+    headers.append('Content-Type', 'application/json');
   }
 
   if (token) {
@@ -116,8 +135,8 @@ export async function registrarUsuario(userData: object) {
   });
 }
 
-export async function loginUsuario(credentials: object) {
-  return apiFetch('/auth/login', {
+export async function loginUsuario(credentials: object): Promise<LoginResponse> {
+  return apiFetch<LoginResponse>('/auth/login', { // <-- Tipado com LoginResponse
     method: 'POST',
     body: JSON.stringify(credentials),
   });
