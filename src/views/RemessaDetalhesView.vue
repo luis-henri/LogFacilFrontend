@@ -59,6 +59,11 @@
         :message="notification.message"
         @close="closeNotification"
     />
+    <AcaoConcluidaPopup
+      :visible="acaoConcluida.visible"
+      :title="acaoConcluida.title"
+      :message="acaoConcluida.message"
+    />
   </div>
 </template>
 
@@ -70,6 +75,7 @@ import Header from '../components/Header.vue';
 import { obterRequisicaoPorId, atualizarRequisicao } from '../http';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import NotificationPopUp from '@/components/NotificationPopUp.vue';
+import AcaoConcluidaPopup from '@/components/AcaoConcluidaPopup.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -93,6 +99,12 @@ function closeNotification() {
     notification.visible = false;
 }
 
+const acaoConcluida = reactive({
+  visible: false,
+  title: '',
+  message: '',
+});
+
 onMounted(async () => {
   const requisicaoId = route.params.id as string;
   try {
@@ -111,7 +123,11 @@ async function finalizarRequisicao() {
   try {
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'concluida' });
     showNotification('Sucesso',`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
-    router.push({ name: 'Monitoramento' }); 
+    
+    acaoConcluida.title = 'Requisição Finalizada!';
+    acaoConcluida.message = 'A requisição foi finalizada com sucesso.';
+    acaoConcluida.visible = true;
+
   } catch (error) {
     console.error("Erro ao finalizar requisição:", error);
     showNotification('Erro',"Não foi possível finalizar a requisição.");

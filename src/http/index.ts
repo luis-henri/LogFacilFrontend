@@ -127,6 +127,10 @@ export async function atualizarUsuario(id: number, data: object): Promise<any> {
     });
 }
 
+export async function obterPerfis(): Promise<any[]> {
+    return apiFetch<any[]>('/usuarios/perfis'); // Ajuste o endpoint se necessário
+}
+
 // A função de registro existente pode ser usada para adicionar novos usuários
 export async function registrarUsuario(userData: object) {
   return apiFetch('/auth/register', {
@@ -140,8 +144,4 @@ export async function loginUsuario(credentials: object): Promise<LoginResponse> 
     method: 'POST',
     body: JSON.stringify(credentials),
   });
-}
-
-export async function obterPerfis(): Promise<any[]> {
-    return apiFetch<any[]>('/users/perfis'); // Ajuste o endpoint se necessário
 }
