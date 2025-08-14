@@ -39,11 +39,18 @@
                 <th>Observação</th>
               </tr>
             </thead>
-            <tbody v-if="!loading">
-              <tr v-if="requisicoes.length === 0">
+            <TransitionGroup tag="tbody" name="list" v-if="!loading">
+              <tr v-if="requisicoes.length === 0" key="no-data">
                 <td colspan="8" class="no-data-message">Nenhuma requisição encontrada.</td>
               </tr>
-              <tr v-for="req in sortedRequisicoes" :key="req.id_requisicao" :class="{ 'row-checked': req.checked }" @click="toggleRowSelection(req)">
+              <tr 
+                v-for="req in sortedRequisicoes" 
+                :key="req.id_requisicao" 
+                class="list-item"
+                :class="{ 'row-checked': req.checked }" 
+                @click="toggleRowSelection(req)"
+              >
+                <!-- O conteúdo da sua <tr> (as <td>) continua exatamente igual -->
                 <td data-label="Selecionar"><input type="checkbox" v-model="req.checked" @click.stop /></td>
                 <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
                 <td data-label="UR">{{ req.requisitante_requisicao }}</td>
@@ -79,7 +86,7 @@
                 </td>
                 <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
               </tr>
-            </tbody>
+            </TransitionGroup>
           </table>
         </div>
         
@@ -143,7 +150,6 @@ import NotificationPopUp from '@/components/NotificationPopUp.vue';
 import { obterRequisicoesPorStatus, atualizarRequisicao, obterTiposEnvio } from '../http/index';
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import AcaoConcluidaPopup from '@/components/AcaoConcluidaPopup.vue';
-import 'animate.css';
 
 const router = useRouter();
 const requisicoes = ref<IRequisicoes[]>([]);
@@ -151,6 +157,8 @@ const loading = ref(true);
 const isSaving = ref(false);
 const userName = ref('Usuário');
 const isDropdownOpen = ref(false);
+
+const prioritizingId = ref<number | null>(null);
 
 const showEnvioPopup = ref(false);
 const showItensPopup = ref(false);
@@ -277,11 +285,12 @@ async function handleTogglePrioridade(req: IRequisicoes) {
     if (index !== -1) {
         const novoStatusPrioridade = !requisicoes.value[index].prioridade_requisicao;
         try {
+            // Apenas atualizamos os dados. O <TransitionGroup> fará a animação.
             await atualizarRequisicao(req.id_requisicao, { prioridade_requisicao: novoStatusPrioridade });
             requisicoes.value[index].prioridade_requisicao = novoStatusPrioridade;
         } catch (error) {
             console.error("Erro ao atualizar prioridade:", error);
-              showNotification('Erro',"Não foi possível alterar a prioridade.");
+            showNotification('Erro',"Não foi possível alterar a prioridade.");
         }
     }
 }
@@ -455,6 +464,22 @@ tbody tr:hover { background-color: #eef2f7; }
 .button-primary { padding: 10px 25px; background-color: #153462; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 500; }
 .button-primary:hover:not(:disabled) { background-color: #112a4f; }
 .button-primary:disabled { background-color: #a0aec0; cursor: not-allowed; }
+.list-move, /* aplica-se à transição de movimento */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* Garante que os itens que saem não ocupem espaço, para um colapso suave */
+.list-leave-active {
+  position: absolute;
+}
 
 /* REGRAS DE RESPONSIVIDADE */
 @media (max-width: 768px) {
