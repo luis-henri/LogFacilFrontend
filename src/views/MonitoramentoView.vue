@@ -35,8 +35,8 @@
                 <th>UR</th>
                 <th>Número</th>
                 <th>Situação</th>
-                <th>Observação</th>
                 <th>Ações</th>
+                <th>Observação</th>
               </tr>
             </thead>
             <tbody v-if="!loading">
@@ -52,7 +52,6 @@
                     {{ req.situacao.descricao_situacao_requisicao }}
                   </span>
                 </td>
-                <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
                 <td data-label="Ações">
                   <div class="acoes-cell">
                     <div class="tooltip-container" data-tooltip="Visualizar Itens">
@@ -60,6 +59,7 @@
                     </div>
                   </div>
                 </td>
+                <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
               </tr>
             </tbody>
           </table>

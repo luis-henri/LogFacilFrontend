@@ -42,7 +42,7 @@ actions: {
             router.push({ name: 'Monitoramento' });
             break;
           case 'ALMOX - Atendimento':
-            router.push({ name: 'Requisicao' }); // Ou a tela de Atendimento
+            router.push({ name: 'Importacao' }); // Ou a tela de Atendimento
             break;
           case 'ALMOX - Separação':
             router.push({ name: 'Separacao' });

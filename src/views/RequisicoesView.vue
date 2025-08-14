@@ -34,9 +34,9 @@
                 <th>UR</th>
                 <th>Número</th>
                 <th>Situação</th>
-                <th>Observação</th>
                 <th>Prioridade - Envio</th>
                 <th>Ações</th>
+                <th>Observação</th>
               </tr>
             </thead>
             <tbody v-if="!loading">
@@ -53,7 +53,6 @@
                     {{ req.situacao.descricao_situacao_requisicao }}
                   </span>
                 </td>
-                <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
                 <td data-label="Envio">
                   <div class="envio-cell">
                     <div class="tooltip-container" :data-tooltip="req.prioridade_requisicao ? 'Desmarcar Prioridade' : 'Marcar como Prioritário'">
@@ -78,6 +77,7 @@
                     </div>
                   </div>
                 </td>
+                <td data-label="Observação">{{ req.observacao_requisicao || '-' }}</td>
               </tr>
             </tbody>
           </table>

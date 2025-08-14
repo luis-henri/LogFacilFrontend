@@ -152,15 +152,32 @@ function removerVolume(index: number) {
 
 async function efetivarPacote() {
   if (!requisicao.value) return;
+
+  if (!requisicao.value.volumes || requisicao.value.volumes.length === 0) {
+    showNotification('Erro de Validação', 'É necessário adicionar pelo menos um volume para efetivar o pacote.');
+    return;
+  }
+
+  for (const [index, volume] of requisicao.value.volumes.entries()) {
+    if (volume.comprimento === null || volume.largura === null || volume.altura === null || volume.peso === null ||
+        volume.comprimento <= 0 || volume.largura <= 0 || volume.altura <= 0 || volume.peso <= 0) {
+      showNotification(
+        'Erro de Validação', 
+        `Por favor, preencha todos os campos com valores válidos para o Volume ${index + 1}.`
+      );
+      return; // Interrompe a função se encontrar um campo inválido
+    }
+  }
+
   isSaving.value = true;
   try {
     const dadosParaAtualizar = {
       status: 'enviado-para-conferencia-expedicao',
       volumes: requisicao.value.volumes.map(v => ({
-          comprimento: v.comprimento || 0,
-          largura: v.largura || 0,
-          altura: v.altura || 0,
-          peso: v.peso || 0
+          comprimento: v.comprimento,
+          largura: v.largura,
+          altura: v.altura,
+          peso: v.peso
       }))
     };
     await atualizarRequisicao(requisicao.value.id_requisicao, dadosParaAtualizar);

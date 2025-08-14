@@ -35,7 +35,9 @@
                       class="input-qty"
                       v-model.number="item.quantidade_atendida_item_requisicao"
                       :max="item.quantidade_solicitada_item_requisicao"
+                      min="0"
                       placeholder="0"
+                      @input="validarQuantidade(item)"
                     >
                   </td>
                 </tr>
@@ -120,8 +122,45 @@ onMounted(async () => {
   }
 });
 
+function validarQuantidade(item: any) {
+  const atendida = item.quantidade_atendida_item_requisicao;
+  const solicitada = item.quantidade_solicitada_item_requisicao;
+
+  // Garante que o valor não é negativo
+  if (atendida !== null && atendida < 0) {
+    item.quantidade_atendida_item_requisicao = 0;
+  }
+
+  // Garante que o valor não excede o solicitado
+  if (atendida !== null && atendida > solicitada) {
+    item.quantidade_atendida_item_requisicao = solicitada;
+    // Opcional: mostrar uma notificação de aviso
+    // showNotification('Atenção', `A quantidade máxima para este item é ${solicitada}.`);
+  }
+}
+
 async function efetivarSeparacao() {
   if (!requisicao.value) return;
+  for (const item of requisicao.value.itens) {
+    const atendida = item.quantidade_atendida_item_requisicao || 0;
+    const solicitada = item.quantidade_solicitada_item_requisicao;
+    
+    if (atendida > solicitada) {
+      showNotification(
+        'Erro de Validação', 
+        `O item "${item.descricao_material_item_requisicao}" tem uma quantidade atendida (${atendida}) maior que a solicitada (${solicitada}). Por favor, corrija.`
+      );
+      return; // Interrompe a função
+    }
+     if (atendida < 0) {
+      showNotification(
+        'Erro de Validação', 
+        `O item "${item.descricao_material_item_requisicao}" não pode ter uma quantidade atendida negativa. Por favor, corrija.`
+      );
+      return; // Interrompe a função
+    }
+  }
+
   isSaving.value = true;
   try {
     const dadosParaAtualizar = {

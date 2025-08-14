@@ -33,6 +33,7 @@
                 <input 
                   type="number" 
                   class="input-qty"
+                  min="0"
                   v-model.number="item.quantidade_atendida_item_requisicao"
                   placeholder="0"
                 >
