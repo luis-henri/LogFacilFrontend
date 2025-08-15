@@ -1,4 +1,7 @@
 <template>
+  <div class="logo-tre">
+      <img src="../assets/Ativo 2@4x.png" alt="Logo do TRE">
+  </div>
   <div class="login-container">
     <div class="login-box">
       <img src="../assets/logosvg.svg" alt="Logo do Log Fácil">
@@ -77,6 +80,19 @@ async function handleLogin() {
 </script>
 
 <style scoped>
+.logo-tre {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    min-width: 50px;
+    min-height: auto;
+}
+.logo-tre img {
+  width: 50%;
+  height: auto;
+}
+
 .login-container { 
     display: flex; 
     justify-content: center; 
