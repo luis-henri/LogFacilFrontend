@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-100">
+  <div class="container">
     <Header title="Requisições - Remessa" />
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
@@ -102,6 +102,11 @@ async function iniciarRemessa(req: IRequisicoes) {
 </script>
 
 <style scoped>
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
 /* Estilos existentes */
 .page-container {
   width: 100%;

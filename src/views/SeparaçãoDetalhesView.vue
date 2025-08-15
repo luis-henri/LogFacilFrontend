@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-100">
+  <div class="container">
     <Header title="Requisição - Separação" />
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
@@ -207,6 +207,11 @@ async function goBack() {
 </script>
 
 <style scoped>
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
 /* Estilos existentes */
 .page-container { width: 100%; display: flex; flex-direction: column; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 .header-container { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }

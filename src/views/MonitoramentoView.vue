@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-100">
+  <div class="container">
     <Header />
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
       <!-- O 'page-container' agora usa flexbox para controlar a altura -->
@@ -203,6 +203,11 @@ function getStatusClass(situacao: string): string {
 </script>
 
 <style scoped>
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
 /* ESTILOS ATUALIZADOS PARA SCROLL E RESPONSIVIDADE */
 .page-container { 
   display: flex;
