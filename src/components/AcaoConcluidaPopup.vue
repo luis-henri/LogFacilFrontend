@@ -4,9 +4,9 @@
       <img src="../assets/logosvg.svg" alt="Logo" class="logo">
       
       <!-- Ícone de Sucesso -->
-      <CheckCircleIcon class="success-icon" />
+      
 
-      <h1>{{ title }}</h1>
+      <h1><CheckCircleIcon class="success-icon" />{{ title }}</h1>
       <p>{{ message }}</p>
       
       <button @click="irParaInicio" class="button-primary">
@@ -100,10 +100,12 @@ function fazerLogout() {
   margin-bottom: 15px;
 }
 .success-icon {
-    width: 60px;
-    height: 60px;
+    width: 30px;
+    height: 30px;
     color: #22c55e; /* Verde Sucesso */
-    margin: 0 auto 15px auto;
+    margin-bottom: -5px;
+    margin-right: 5px;
+    margin-left: 0px;
 }
 h1 {
   font-size: 24px;
