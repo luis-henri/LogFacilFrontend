@@ -224,18 +224,6 @@ onMounted(async () => {
   await carregarTiposEnvio();
 });
 
-async function carregarDados() {
-  loading.value = true;
-  try {
-    const dadosApi = await obterRequisicoesPorStatus('pendente');
-    requisicoes.value = dadosApi.map(req => ({ ...req, checked: false }));
-  } catch (error: any) {
-    alert(`Erro ao buscar dados: ${error.message}`);
-  } finally {
-    loading.value = false;
-  }
-}
-
 async function carregarTiposEnvio() {
     try {
         tiposEnvio.value = await obterTiposEnvio();
@@ -323,19 +311,16 @@ function getDescricaoTipoEnvio(req: IRequisicoes): string {
 }
 
 
-async function handleEnvioConfirm(tipoEnvioId: number | null) {
+async function handleEnvioConfirm(tipoEnvioId: number) {
     if (!requisicaoSelecionada.value) {
         closeSelecionarEnvioPopup();
         return;
     }
 
     try {
-        // Se tipoEnvioId for null, significa que queremos usar o padrão
-        const idParaEnviar = tipoEnvioId !== null ? tipoEnvioId : await obterIdTipoEnvioPadrao();
-        
         const updatedReq = await atualizarRequisicao(
             requisicaoSelecionada.value.id_requisicao, 
-            { id_tipo_envio_requisicao: idParaEnviar }
+            { id_tipo_envio_requisicao: tipoEnvioId }
         );
         
         const index = requisicoes.value.findIndex(r => r.id_requisicao === requisicaoSelecionada.value!.id_requisicao);
@@ -348,6 +333,26 @@ async function handleEnvioConfirm(tipoEnvioId: number | null) {
     } finally {
         closeSelecionarEnvioPopup();
     }
+}
+
+async function carregarDados() {
+  loading.value = true;
+  try {
+    const dadosApi = await obterRequisicoesPorStatus('pendente');
+    requisicoes.value = dadosApi.map(req => ({ 
+      ...req, 
+      checked: false,
+      // Define Normal (PAC) como padrão visual se não tiver tipo de envio
+      tipo_envio: req.tipo_envio || { 
+        id_tipo_envio_requisicao: 4, 
+        descricao_tipo_envio_requisicao: 'Normal (PAC)' 
+      }
+    }));
+  } catch (error: any) {
+    showNotification('erro', "Erro ao buscar dados: " + error.message);
+  } finally {
+    loading.value = false;
+  }
 }
 
 async function obterIdTipoEnvioPadrao(): Promise<number> {

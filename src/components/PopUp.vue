@@ -19,7 +19,7 @@
             v-model="selecaoInterna"
           >
           <label for="envio-padrao">
-            
+            Normal (PAC)
           </label>
         </div>
         
@@ -61,7 +61,7 @@ const selecaoInterna = ref<number | null>(null);
 // Quando o popup se torna visível, atualiza a seleção interna
 watch(() => props.visible, (isVisible) => {
   if (isVisible) {
-    selecaoInterna.value = props.selecaoAtual;
+    selecaoInterna.value = props.selecaoAtual || 4; // 4 é o ID do envio padrão (Normal PAC)
   }
 });
 

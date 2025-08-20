@@ -32,7 +32,7 @@
                   <td data-label="Envio">
                     <div class="envio-cell">
                       <ArrowUpCircleIcon v-if="req.prioridade_requisicao" class="icon-prioridade-ativa" title="Prioritário" />
-                      <span>{{ req.tipo_envio?.descricao_tipo_envio_requisicao || '-' }}</span>
+                      <span>{{ getDescricaoTipoEnvio(req) }}</span>
                     </div>
                   </td>
                   <td data-label="Ações" class="text-center">
@@ -74,6 +74,16 @@ const notification = reactive({
     message: ''
 });
 
+function getDescricaoTipoEnvio(req: IRequisicoes): string {
+  // Se tem tipo de envio definido, mostra a descrição
+  if (req.tipo_envio?.descricao_tipo_envio_requisicao) {
+    return req.tipo_envio.descricao_tipo_envio_requisicao;
+  }
+  
+  // Se não tem, mostra traço (não define padrão aqui)
+  return '-';
+}
+
 function showNotification(title: string, message: string){
     notification.title = title;
     notification.message = message;
@@ -89,6 +99,7 @@ onMounted(async () => {
     requisicoes.value = await obterRequisicoesPorStatus('enviado-para-separacao');
   } catch (error) {
     console.error("Erro ao buscar requisições para separação:", error);
+    showNotification('Erro', 'Não foi possível carregar as requisições');
   } finally {
     loading.value = false;
   }
