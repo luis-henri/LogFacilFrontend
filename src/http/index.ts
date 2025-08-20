@@ -1,5 +1,7 @@
 import type { IRequisicoes } from '../interfaces/IRequisicoes';
 import type { IUsuario } from '../interfaces/IUsuario';
+// Adicione esta importação
+import type { ITipoEnvio } from '../interfaces/IRequisicoes';
 
 interface Perfil {
   id: number;
@@ -55,16 +57,30 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
   return responseData as T;
 }
 
-
 export async function obterRequisicoesMonitoramento(): Promise<IRequisicoes[]> {
   return apiFetch<IRequisicoes[]>('/requisicoes/monitoramento');
 }
 
 /**
  * FUNÇÃO ADICIONADA: Busca a lista de tipos de envio disponíveis.
+ * Agora tipada corretamente com ITipoEnvio
  */
-export async function obterTiposEnvio(): Promise<any[]> {
-  return apiFetch<any[]>('/requisicoes/tipos-envio');
+export async function obterTiposEnvio(): Promise<ITipoEnvio[]> {
+  return apiFetch<ITipoEnvio[]>('/requisicoes/tipos-envio');
+}
+
+/**
+ * NOVA FUNÇÃO: Busca o ID do tipo de envio padrão (Normal PAC)
+ */
+export async function obterIdTipoEnvioPadrao(): Promise<number> {
+  try {
+    const tipos = await obterTiposEnvio();
+    const tipoPadrao = tipos.find(t => t.descricao_tipo_envio_requisicao === 'Normal (PAC)');
+    return tipoPadrao ? tipoPadrao.id_tipo_envio_requisicao : tipos[0]?.id_tipo_envio_requisicao || 1;
+  } catch (error) {
+    console.error("Erro ao obter ID do tipo de envio padrão:", error);
+    return 1; // Fallback
+  }
 }
 
 export async function obterRequisicoes(): Promise<IRequisicoes[]> {

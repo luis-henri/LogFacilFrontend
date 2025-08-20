@@ -68,9 +68,13 @@
                         :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]"
                       />
                     </div>
-                    <span v-if="req.tipo_envio" class="text-xs font-semibold">{{ req.tipo_envio.descricao_tipo_envio_requisicao }}</span>
-                    <div v-else class="tooltip-container" data-tooltip="Selecionar Tipo de Envio">
-                      <TruckIcon @click.stop="openSelecionarEnvioPopup(req)" class="icon-acao" />
+                    <div class="tooltip-container" :data-tooltip="'Alterar Tipo de Envio'">
+                      <button 
+                        @click.stop="openSelecionarEnvioPopup(req)" 
+                        class="button-envio-link"
+                        >
+                        {{ getDescricaoTipoEnvio(req) }}
+                      </button>
                     </div>
                   </div>
                 </td>
@@ -141,7 +145,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { UserCircleIcon, TruckIcon, EyeIcon, TrashIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
+import { UserCircleIcon, EyeIcon, TrashIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
 import Header from '../components/Header.vue';
 import PopUp from '../components/PopUp.vue';
 import VisualizarItensPopup from '../components/VisualizarItensPopup.vue';
@@ -256,8 +260,14 @@ function toggleRowSelection(req: IRequisicoes) { req.checked = !req.checked; }
 async function iniciarSeparacaoEmMassa() {
     const selecionadas = requisicoes.value.filter(req => req.checked);
     if (selecionadas.length === 0) {
-        // A sua notificação de erro continua igual
         showNotification('Atenção', "Por favor, selecione pelo menos uma requisição para iniciar a separação.");
+        return;
+    }
+
+    // Verifica se TODAS as requisições selecionadas têm um tipo de envio
+    const todasTemEnvio = selecionadas.every(req => !!req.tipo_envio);
+    if (!todasTemEnvio) {
+        showNotification('Atenção', 'Por favor, defina o tipo de envio para todas as requisições selecionadas antes de continuar.');
         return;
     }
     
@@ -268,7 +278,6 @@ async function iniciarSeparacaoEmMassa() {
         );
         await Promise.all(promessas);
 
-        // Em vez de chamar a notificação simples, ativamos o novo popup
         acaoConcluida.title = 'Sucesso!';
         acaoConcluida.message = `${selecionadas.length} requisição(ões) enviada(s) para separação.`;
         acaoConcluida.visible = true;
@@ -304,24 +313,54 @@ function closeSelecionarEnvioPopup() {
   showEnvioPopup.value = false;
 }
 
-async function handleEnvioConfirm(tipoEnvioId: number) {
-    if (!requisicaoSelecionada.value || !tipoEnvioId) {
+function getDescricaoTipoEnvio(req: IRequisicoes): string {
+  if (req.tipo_envio) {
+    return req.tipo_envio.descricao_tipo_envio_requisicao;
+  }
+  
+  // Define "Normal (PAC)" como padrão se não houver tipo definido
+  return 'Normal (PAC)';
+}
+
+
+async function handleEnvioConfirm(tipoEnvioId: number | null) {
+    if (!requisicaoSelecionada.value) {
         closeSelecionarEnvioPopup();
         return;
-    };
+    }
 
     try {
-        const updatedReq = await atualizarRequisicao(requisicaoSelecionada.value.id_requisicao, { id_tipo_envio_requisicao: tipoEnvioId });
+        // Se tipoEnvioId for null, significa que queremos usar o padrão
+        const idParaEnviar = tipoEnvioId !== null ? tipoEnvioId : await obterIdTipoEnvioPadrao();
+        
+        const updatedReq = await atualizarRequisicao(
+            requisicaoSelecionada.value.id_requisicao, 
+            { id_tipo_envio_requisicao: idParaEnviar }
+        );
+        
         const index = requisicoes.value.findIndex(r => r.id_requisicao === requisicaoSelecionada.value!.id_requisicao);
         if (index !== -1) {
             requisicoes.value[index].tipo_envio = updatedReq.tipo_envio;
         }
     } catch (error) {
         console.error("Erro ao atualizar tipo de envio:", error);
-        alert("Falha ao guardar o tipo de envio.");
+        showNotification('Erro', "Falha ao guardar o tipo de envio.");
     } finally {
         closeSelecionarEnvioPopup();
     }
+}
+
+async function obterIdTipoEnvioPadrao(): Promise<number> {
+    const tipoPadrao = tiposEnvio.value.find(t => 
+        t.descricao_tipo_envio_requisicao === 'Normal (PAC)'
+    );
+    
+    if (tipoPadrao) {
+        return tipoPadrao.id_tipo_envio_requisicao;
+    }
+    
+    // Fallback: retorna o primeiro tipo disponível
+    return tiposEnvio.value[0]?.id_tipo_envio_requisicao || 1;
 }
 
 function openVisualizarItensPopup(req: IRequisicoes) {
@@ -404,6 +443,23 @@ function getStatusClass(situacao: string): string {
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.button-envio-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: inherit; /* Herda o tamanho da fonte da célula da tabela */
+  font-weight: 500;
+  text-decoration: underline;
+  transition: color 0.2s;
+  text-align: left;
+}
+
+.button-envio-link:hover {
+  color: #2563eb; /* Azul mais escuro ao passar o mouse */
+  text-decoration-style: solid; /* Sublinhado sólido ao passar o mouse */
 }
 .header-container { flex-shrink: 0; }
 .footer-actions { flex-shrink: 0; }

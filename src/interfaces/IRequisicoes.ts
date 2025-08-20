@@ -1,3 +1,6 @@
+// ARQUIVO: src/interfaces/IRequisicoes.ts
+// VERSÃO FINAL E CORRIGIDA para resolver o erro de tipo 'never'
+
 // Define a estrutura de um único Volume
 export interface IVolume {
   id_requisicao?: number
@@ -18,6 +21,12 @@ export interface IItemRequisicao {
   quantidade_atendida_item_requisicao: number | null;
 } 
 
+// Define a estrutura do Tipo de Envio de forma clara e exportável
+export interface ITipoEnvio {
+  id_tipo_envio_requisicao: number;
+  descricao_tipo_envio_requisicao: string;
+}
+
 // Define a estrutura principal de uma Requisição
 export interface IRequisicoes {
   id_requisicao: number;
@@ -30,11 +39,14 @@ export interface IRequisicoes {
   };
   observacao_requisicao: string | null;
   prioridade_requisicao: boolean;
-  tipo_envio?: {
-    id_tipo_envio_requisicao: number;
-    descricao_tipo_envio_requisicao: string;
-  } | null;
+  
+  // CORREÇÃO: Usa a interface ITipoEnvio e garante que a propriedade é opcional
+  // e pode ser nula, o que reflete a resposta da sua API.
+  tipo_envio?: ITipoEnvio | null;
+  
+  // Mantém esta propriedade para compatibilidade com o PopUp
   id_tipo_envio_requisicao?: number | null;
+
   itens: IItemRequisicao[];
   volumes: IVolume[];
   checked?: boolean;

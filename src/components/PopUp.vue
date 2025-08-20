@@ -5,11 +5,25 @@
       
       <!-- Estado de Carregamento -->
       <div v-if="!tiposEnvio || tiposEnvio.length === 0" class="loading-state">
-        A carregar opções de envio...
+        Carregando opções de envio...
       </div>
 
       <!-- Lista de Opções -->
       <div v-else class="options-container">
+        <!-- Opção para usar o padrão (Normal PAC) -->
+        <div class="radio-item">
+          <input 
+            type="radio" 
+            id="envio-padrao" 
+            :value="null" 
+            v-model="selecaoInterna"
+          >
+          <label for="envio-padrao">
+            
+          </label>
+        </div>
+        
+        <!-- Opções de tipos de envio -->
         <div v-for="tipo in tiposEnvio" :key="tipo.id_tipo_envio_requisicao" class="radio-item">
           <input 
             type="radio" 
@@ -25,7 +39,7 @@
 
       <div class="actions">
         <button @click="closePopup" class="button-secondary">Cancelar</button>
-        <button @click="confirmAction" class="button-confirm" :disabled="!selecaoInterna">Confirmar</button>
+        <button @click="confirmAction" class="button-confirm">Confirmar</button>
       </div>
     </div>
   </div>
