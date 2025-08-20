@@ -24,20 +24,35 @@
           <thead>
             <tr>
               <th>Volume</th>
-              <th>Comprimento</th>
+              <th>Comprimento</th>  
               <th>Largura</th>
               <th>Altura</th>
               <th>Peso</th>
+              <th>
+                <input 
+                  type="checkbox" 
+                  v-model="allSelected" 
+                  @change="toggleSelectAll"
+                  :indeterminate="algunsSelecionados"
+                >
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(volume, index) in requisicao.volumes" :key="index">
+            <tr v-for="(volume, index) in volumesComChecked" :key="index">
               <!-- ATRIBUTOS ADICIONADOS AQUI -->
               <td data-label="Volume">{{ index + 1 }}</td>
               <td data-label="Comprimento">{{ volume.comprimento }} cm</td>
               <td data-label="Largura">{{ volume.largura }} cm</td>
               <td data-label="Altura">{{ volume.altura }} cm</td>
               <td data-label="Peso">{{ volume.peso }} kg</td>
+              <td data-label="Selecionar">
+                <input 
+                  type="checkbox" 
+                  v-model="volume.checked"
+                  @change="atualizarSelecao"
+                >
+              </td>
             </tr>
           </tbody>
         </table>
@@ -69,11 +84,11 @@
 
 <script lang="ts" setup>
 // O script permanece o mesmo
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Header from '../components/Header.vue';
 import { obterRequisicaoPorId, atualizarRequisicao } from '../http';
-import type { IRequisicoes } from '../interfaces/IRequisicoes';
+import type { IRequisicoes, IVolume } from '../interfaces/IRequisicoes';
 import NotificationPopUp from '@/components/NotificationPopUp.vue';
 import AcaoConcluidaPopup from '@/components/AcaoConcluidaPopup.vue';
 
@@ -82,6 +97,12 @@ const router = useRouter();
 const requisicao = ref<IRequisicoes | null>(null);
 const loading = ref(true);
 const isSaving = ref(false);
+
+interface VolumeComChecked extends IVolume {
+  checked?: boolean;
+}
+
+const volumesComChecked = ref<VolumeComChecked[]>([]);
 
 const notification = reactive({
     visible: false,
@@ -105,10 +126,50 @@ const acaoConcluida = reactive({
   message: '',
 });
 
+const temVolumesSelecionados = computed(() => {
+  return volumesComChecked.value.some(volume => volume.checked);
+});
+
+function toggleSelectAll(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const isChecked = target.checked;
+  
+  volumesComChecked.value.forEach(volume => {
+    volume.checked = isChecked;
+  });
+}
+
+// CORREÇÃO: Implementação correta do allSelected computed
+const allSelected = computed({
+  get: () => volumesComChecked.value.length > 0 && volumesComChecked.value.every(volume => volume.checked),
+  set: (value: boolean) => {
+    volumesComChecked.value.forEach(volume => {
+      volume.checked = value;
+    });
+  }
+});
+
+const algunsSelecionados = computed(() => {
+  if (!requisicao.value?.volumes) return false;
+  const selecionados = requisicao.value.volumes.filter(volume => (volume as VolumeComChecked).checked).length;
+  return selecionados > 0 && selecionados < requisicao.value.volumes.length;
+});
+
+function atualizarSelecao() {
+  // Força a atualização das computed properties
+}
+
 onMounted(async () => {
   const requisicaoId = route.params.id as string;
   try {
     requisicao.value = await obterRequisicaoPorId(requisicaoId);
+    // CORREÇÃO: Inicializar volumesComChecked com a propriedade checked
+    if (requisicao.value?.volumes) {
+      volumesComChecked.value = requisicao.value.volumes.map(volume => ({
+        ...volume,
+        checked: false
+      }));
+    }
   } catch (error) {
     console.error("Erro ao buscar dados da requisição para remessa:", error);
     showNotification('Erro', "Não foi possível carregar os dados da requisição.");
@@ -118,11 +179,11 @@ onMounted(async () => {
 });
 
 async function finalizarRequisicao() {
-  if (!requisicao.value) return;
+  if (!requisicao.value || !temVolumesSelecionados.value) return;
+  
   isSaving.value = true;
   try {
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'concluida' });
-    showNotification('Sucesso',`Requisição ${requisicao.value.numero_requisicao} finalizada com sucesso!`);
     
     acaoConcluida.title = 'Requisição Finalizada!';
     acaoConcluida.message = 'A requisição foi finalizada com sucesso.';
@@ -142,22 +203,23 @@ async function goBack() {
     return;
   }
   try {
-    // 1. Reverte o status da requisição para o estado anterior
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'enviado-para-conferencia-expedicao' });
-    
-    // 2. Navega de volta para a tela de lista
     router.push({ name: 'Remessa' });
-
   } catch (error) {
     console.error("Erro ao voltar e reverter status:", error);
     showNotification('Erro', 'Ocorreu um erro ao tentar voltar.');
-    // Mesmo com erro, tenta navegar de volta
     router.push({ name: 'Remessa' });
   }
 }
 </script>
 
 <style scoped>
+/* Estilos existentes mantidos */
+/* Adicione este estilo para o checkbox indeterminado */
+input[type="checkbox"]:indeterminate {
+  background-color: #153462;
+  border-color: #153462;
+}
 .container {
   max-width: 100%;
   margin: 0 auto;
