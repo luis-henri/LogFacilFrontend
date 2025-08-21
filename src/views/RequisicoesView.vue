@@ -34,7 +34,8 @@
                 <th>UR</th>
                 <th>Número</th>
                 <th>Situação</th>
-                <th>Prioridade - Envio</th>
+                <th>Prioridade</th>
+                <th>Envio</th>
                 <th>Ações</th>
                 <th>Observação</th>
               </tr>
@@ -60,7 +61,7 @@
                     {{ req.situacao.descricao_situacao_requisicao }}
                   </span>
                 </td>
-                <td data-label="Envio">
+                <td data-label="Prioridade">
                   <div class="envio-cell">
                     <div class="tooltip-container" :data-tooltip="req.prioridade_requisicao ? 'Desmarcar Prioridade' : 'Marcar como Prioritário'">
                       <ArrowUpCircleIcon 
@@ -68,6 +69,10 @@
                         :class="['icon-acao-prioridade', { 'icon-prioridade-ativa': req.prioridade_requisicao }]"
                       />
                     </div>
+                   </div> 
+                  </td>  
+                <td data-label="Envio">
+                  <div data-label="envio-cell">
                     <div class="tooltip-container" :data-tooltip="'Alterar Tipo de Envio'">
                       <button 
                         @click.stop="openSelecionarEnvioPopup(req)" 
@@ -96,9 +101,9 @@
         
         <footer class="footer-actions">
             <button 
-                @click="iniciarSeparacaoEmMassa" 
-                class="button-primary"
-                :disabled="!temRequisicoesSelecionadas || isSaving"
+              @click="iniciarSeparacaoEmMassa" 
+              class="button-primary"
+              :disabled="!temRequisicoesSelecionadas || isSaving"
             >
                 {{ isSaving ? 'Aguarde...' : 'Enviar para Separação' }}
             </button>
@@ -518,7 +523,7 @@ tbody tr { cursor: pointer; }
 tbody tr:hover { background-color: #eef2f7; }
 .row-checked { background-color: #e6f2ff !important; }
 .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 0.8em; font-weight: 500; color: #fff; text-transform: capitalize; min-width: 80px; text-align: center; display: inline-block; }
-.status-recebida { background-color: #28a745; }
+.status-recebida { background-color: #8d918e; }
 .status-cancelada { background-color: #dc3545; }
 .no-data-message, .loading-message { text-align: center; padding: 20px; color: #6c757d; font-style: italic; }
 .acoes-cell, .envio-cell { display: flex; align-items: center; gap: 16px; justify-content: center; }
