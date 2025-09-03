@@ -1,40 +1,58 @@
-# LogFacil
+LogFácil - Frontend (Vue 3)
 
-This template should help get you started developing with Vue 3 in Vite.
+Stack
 
-## Recommended IDE Setup
+- Vue 3, Vite, TypeScript
+- Pinia (store de autenticação)
+- Vue Router (guards com `requiresAuth` e `allowedPerfis`)
+- Animate.css, Heroicons, Maska
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Funcionalidades
 
-## Type Support for `.vue` Imports in TS
+- Login e redirecionamento por perfil
+- Importação de requisições via arquivo (TXT)
+- Monitoramento de requisições e detalhes por etapa (separação, conferência, embalagem, remessa)
+- Gerenciamento de usuários (listagem/alteração de perfil e situação)
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+Variáveis de ambiente
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+- Criar `.env` na raiz do frontend:
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```
+VITE_API_URL=http://localhost:3000/api
 ```
 
-### Compile and Hot-Reload for Development
+Setup
 
-```sh
+```
+npm install
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Build
 
-```sh
+```
 npm run build
 ```
+
+Autenticação e Autorização
+
+- O `Auth Store` (`src/stores/auth.ts`) gerencia `token` e `user` (localStorage)
+- `login(credentials)` chama `POST /api/auth/login` e guarda JWT
+- Guardas de rota em `src/router/index.ts`:
+  - `requiresAuth`: exige login
+  - `allowedPerfis`: perfis permitidos por rota (ex.: "Administrador - Geral")
+
+HTTP Client
+
+- `src/http/index.ts` centraliza chamadas à API
+- Injeta `Authorization: Bearer <token>` quando disponível
+- `importarRequisicoes(file)` usa `FormData` (sem `Content-Type` manual)
+
+Rotas principais
+
+- `/login` (pública)
+- `/importacao`, `/requisicao` (Atendimento)
+- `/monitoramento`, `/gerenciamento-usuarios` (Admin)
+- `/separacao( -detalhes/:id)`, `/conferencia( -detalhes/:id)`, `/embalagem( -detalhes/:id)`, `/remessa( -detalhes/:id)`
+
