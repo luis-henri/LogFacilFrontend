@@ -47,12 +47,12 @@
               <option value="Em Atendimento">Em Atendimento</option>
               <option value="Em Separação">Em Separação</option>
               <option value="Enviado para Separação">Enviado para Separação</option>
-              <option value="Em Conferência">Em Conferência</option>
-              <option value="Enviado para Conferência">Enviado para Conferência</option>
+              <option value="Em Conferência">Em Conferência - Separação</option>
+              <option value="Enviado para Conferência">Enviado para Conferência - Separação</option>
               <option value="Em Embalagem">Em Embalagem</option>
               <option value="Enviado para Embalagem">Enviado para Embalagem</option>
-              <option value="Em Expedição">Enviado para Expedição</option>
-              <option value="Enviado para Expedição">Enviado para Expedição</option>
+              <option value="Em Expedição">Em Conferência Expedição</option>
+              <option value="Enviado para Expedição">Enviado para Conferência - Expedição</option>
               <option value="Concluída">Concluída</option>
               <option value="Cancelada">Cancelada</option>
             </select>
