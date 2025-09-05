@@ -25,6 +25,34 @@
           </div>
         </div>
 
+        <!-- Filtros -->
+        <div class="filters-container">
+          <div class="filter-item">
+            <label for="data">Data</label>
+            <input v-model="filtroData" type="date" id="data" class="filter-input" />
+          </div>
+          <div class="filter-item">
+            <label for="ur">UR</label>
+            <input v-model="filtroUR" type="text" id="ur" placeholder="Filtrar por UR" class="filter-input" />
+          </div>
+          <div class="filter-item">
+            <label for="numero">Número da Requisição</label>
+            <input v-model="filtroNumero" type="text" id="numero" placeholder="Filtrar por Número" class="filter-input" />
+          </div>
+          <div class="filter-item">
+            <label for="situacao">Situação</label>
+            <select v-model="filtroSituacao" id="situacao" class="filter-select">
+              <option value="">Todas</option>
+              <option v-for="situacao in situacoesUnicas" :key="situacao" :value="situacao">
+                {{ situacao }}
+              </option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <button @click="limparFiltros" class="button-clear-filters">Limpar Filtros</button>
+          </div>
+        </div>
+
         <!-- NOVO CONTAINER PARA A BARRA DE ROLAGEM E RESPONSIVIDADE -->
         <div class="table-scroll-container">
           <div v-if="loading" class="loading-message">Carregando requisições...</div>
@@ -40,10 +68,10 @@
               </tr>
             </thead>
             <tbody v-if="!loading">
-              <tr v-if="requisicoes.length === 0">
-                <td colspan="6" class="no-data-message">Nenhuma requisição em monitoramento.</td>
+              <tr v-if="requisicoesFiltradas.length === 0">
+                <td colspan="6" class="no-data-message">Nenhuma requisição encontrada com os filtros aplicados.</td>
               </tr>
-              <tr v-for="req in requisicoes" :key="req.id_requisicao" class="hover:bg-gray-50">
+              <tr v-for="req in requisicoesFiltradas" :key="req.id_requisicao" class="hover:bg-gray-50">
                 <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
                 <td data-label="UR">{{ req.requisitante_requisicao }}</td>
                 <td data-label="Número">{{ req.numero_requisicao }}</td>
@@ -84,7 +112,7 @@
 
 <script lang="ts" setup>
 import Header from '@/components/Header.vue';
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserCircleIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import VisualizarItensPopup from '../components/VisualizarItensPopup.vue';
@@ -99,6 +127,19 @@ const userName = ref('Usuário');
 const isDropdownOpen = ref(false);
 const showItensPopup = ref(false);
 const requisicaoSelecionada = ref<IRequisicoes | null>(null);
+
+function limparFiltros() {
+  filtroData.value = '';
+  filtroUR.value = '';
+  filtroNumero.value = '';
+  filtroSituacao.value = '';
+}
+
+// Refs para os filtros
+const filtroData = ref('');
+const filtroUR = ref('');
+const filtroNumero = ref('');
+const filtroSituacao = ref('');
 
 const notification = reactive({
     visible: false,
@@ -115,6 +156,21 @@ function showNotification(title: string, message: string){
 function closeNotification() {
     notification.visible = false;
 }
+
+const requisicoesFiltradas = computed(() => {
+  return requisicoes.value.filter(req => {
+    const dataMatch = !filtroData.value || req.data_requisicao.startsWith(filtroData.value);
+    const urMatch = !filtroUR.value || req.requisitante_requisicao.toLowerCase().includes(filtroUR.value.toLowerCase());
+    const numeroMatch = !filtroNumero.value || req.numero_requisicao.toString().includes(filtroNumero.value);
+    const situacaoMatch = !filtroSituacao.value || req.situacao.descricao_situacao_requisicao === filtroSituacao.value;
+    return dataMatch && urMatch && numeroMatch && situacaoMatch;
+  });
+});
+
+const situacoesUnicas = computed(() => {
+  const situacoes = requisicoes.value.map(req => req.situacao.descricao_situacao_requisicao);
+  return [...new Set(situacoes)];
+});
 
 
 onMounted(async () => {
@@ -219,6 +275,56 @@ function getStatusClass(situacao: string): string {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
 }
 .header-container { flex-shrink: 0; }
+
+.filters-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-item label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.filter-input, .filter-select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #fff;
+  font-size: 0.875rem;
+}
+
+.filter-input:focus, .filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+.button-clear-filters {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #f3f4f6;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  align-self: flex-end;
+  height: 100%;
+}
+
+.button-clear-filters:hover {
+  background-color: #e5e7eb;
+}
+
 
 .table-scroll-container {
   flex-grow: 1; /* Faz a área da tabela crescer */
