@@ -51,7 +51,7 @@
               <option value="Enviado para Conferência">Enviado para Conferência - Separação</option>
               <option value="Em Embalagem">Em Embalagem</option>
               <option value="Enviado para Embalagem">Enviado para Embalagem</option>
-              <option value="Em Expedição">Em Conferência Expedição</option>
+              <option value="Em Expedição">Em Conferência - Expedição</option>
               <option value="Enviado para Expedição">Enviado para Conferência - Expedição</option>
               <option value="Concluída">Concluída</option>
               <option value="Cancelada">Cancelada</option>
@@ -248,12 +248,12 @@ function getStatusClass(situacao: string): string {
     'em-atendimento': 'status-em-atendimento',
     'em-separacao': 'status-em-separacao',
     'enviado-para-separacao' : 'status-enviado-para-separacao',
-    'em-conferencia': 'status-em-conferencia',
-    'enviado-para-conferencia' : 'status-enviado-para-conferencia',
+    'em-conferencia-separacao': 'status-em-conferencia-separacao',
+    'enviado-para-conferencia-separacao' : 'status-enviado-para-conferencia-separacao',
     'em-embalagem': 'status-em-embalagem',
     'enviado-para-embalagem' : 'status-enviado-para-embalagem',
-    'em-expedicao': 'status-em-expedicao',
-    'enviado-para-expedicao' : 'status-enviado-para-expedicao',
+    'em-conferencia-expedicao': 'status-em-conferencia-expedicao',
+    'enviado-para-conferencia-expedicao' : 'status-enviado-para-conferencia-expedicao',
     'concluida': 'status-concluida',
     'cancelada': 'status-cancelada'
   };
