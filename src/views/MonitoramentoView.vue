@@ -43,18 +43,9 @@
             <label for="situacao">Situação</label>
             <select v-model="filtroSituacao" id="situacao" class="filter-select">
               <option value="">Todas</option>
-              <option value="Pendente">Pendente</option>
-              <option value="Em Atendimento">Em Atendimento</option>
-              <option value="Em Separação">Em Separação</option>
-              <option value="Enviado para Separação">Enviado para Separação</option>
-              <option value="Em Conferência">Em Conferência - Separação</option>
-              <option value="Enviado para Conferência">Enviado para Conferência - Separação</option>
-              <option value="Em Embalagem">Em Embalagem</option>
-              <option value="Enviado para Embalagem">Enviado para Embalagem</option>
-              <option value="Em Expedição">Em Conferência - Expedição</option>
-              <option value="Enviado para Expedição">Enviado para Conferência - Expedição</option>
-              <option value="Concluída">Concluída</option>
-              <option value="Cancelada">Cancelada</option>
+              <option v-for="situacao in situacoesUnicas" :key="situacao" :value="situacao">
+                {{ situacao }}
+              </option>
             </select>
           </div>
           <div class="filter-item">
@@ -176,6 +167,11 @@ const requisicoesFiltradas = computed(() => {
   });
 });
 
+const situacoesUnicas = computed(() => {
+  const situacoes = requisicoes.value.map(req => req.situacao.descricao_situacao_requisicao);
+  return [...new Set(situacoes)];
+});
+
 
 onMounted(async () => {
   const token = localStorage.getItem('user-token');
@@ -248,12 +244,12 @@ function getStatusClass(situacao: string): string {
     'em-atendimento': 'status-em-atendimento',
     'em-separacao': 'status-em-separacao',
     'enviado-para-separacao' : 'status-enviado-para-separacao',
-    'em-conferencia-separacao': 'status-em-conferencia-separacao',
-    'enviado-para-conferencia-separacao' : 'status-enviado-para-conferencia-separacao',
+    'em-conferencia': 'status-em-conferencia',
+    'enviado-para-conferencia' : 'status-enviado-para-conferencia',
     'em-embalagem': 'status-em-embalagem',
     'enviado-para-embalagem' : 'status-enviado-para-embalagem',
-    'em-conferencia-expedicao': 'status-em-conferencia-expedicao',
-    'enviado-para-conferencia-expedicao' : 'status-enviado-para-conferencia-expedicao',
+    'em-expedicao': 'status-em-expedicao',
+    'enviado-para-expedicao' : 'status-enviado-para-expedicao',
     'concluida': 'status-concluida',
     'cancelada': 'status-cancelada'
   };
