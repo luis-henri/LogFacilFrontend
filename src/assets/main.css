@@ -22,16 +22,17 @@ a,
 }
 
 @media (min-width: 1024px) {
-  body {
+  /*body {
     display: flex;
     place-items: center;
-  }
+  }*/
+
 
   #app {
-    display: grid;
-    /* Comentado para não interferir com o layout atual */
-    /* grid-template-columns: 1fr 1fr; */
-    padding: 0 2rem;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0; /* Garantir que não há padding */
+  margin: 0;
   }
 
 } 
