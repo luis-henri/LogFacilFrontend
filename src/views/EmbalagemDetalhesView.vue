@@ -16,7 +16,7 @@
       </div>
 
       <div class="volumes-section">
-        <h3 class="items-title">Medidas do Pacote</h3>
+        <h3 class="items-title">Dimensões do Volume</h3>
         <button @click="adicionarVolume" class="button-add-volume">Adicionar Volume</button>
       </div>
 

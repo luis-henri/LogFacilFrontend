@@ -14,7 +14,7 @@
         <div><strong>Tipo de Envio:</strong> {{ requisicao.tipo_envio?.descricao_tipo_envio_requisicao || 'Não definido' }}</div>
       </div>
 
-      <h3 class="items-title">Medidas do Pacote</h3>
+      <h3 class="items-title">Dimensões do Volume</h3>
       <div v-if="!requisicao.volumes || requisicao.volumes.length === 0" class="no-data-message">
         Nenhum volume registado para esta requisição.
       </div>
