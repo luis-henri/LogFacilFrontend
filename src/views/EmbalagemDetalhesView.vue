@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header title="Requisição - Embalagem" />
-    <main class="grow p-4 sm:p-6 lg:p-8">
+    <main class="flex-grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
       <div class="header-container">
         <h2 class="container-title">Requisicão - Embalagem</h2>
@@ -40,10 +40,10 @@
             <tr v-for="(volume, index) in requisicao.volumes" :key="index">
               <!-- ATRIBUTOS ADICIONADOS AQUI -->
               <td data-label="Volume">{{ index + 1 }}</td>
-              <td data-label="Comprimento (cm)"><input type="number" v-model.number="volume.comprimento" class="input-measure"></td>
-              <td data-label="Largura (cm)"><input type="number" v-model.number="volume.largura" class="input-measure"></td>
-              <td data-label="Altura (cm)"><input type="number" v-model.number="volume.altura" class="input-measure"></td>
-              <td data-label="Peso (kg)"><input type="number" v-model.number="volume.peso" class="input-measure"></td>
+              <td data-label="Comprimento (cm)"><input type="number" min="0" placeholder="0" v-model.number="volume.comprimento" class="input-measure"></td>
+              <td data-label="Largura (cm)"><input type="number" min="0" placeholder="0" v-model.number="volume.largura" class="input-measure"></td>
+              <td data-label="Altura (cm)"><input type="number" min="0" placeholder="0" v-model.number="volume.altura" class="input-measure"></td>
+              <td data-label="Peso (kg)"><input type="number" min="0" placeholder="0" v-model.number="volume.peso" class="input-measure"></td>
               <td data-label="Excluir" class="actions-cell">
                 <TrashIcon 
                   @click="removerVolume(index)"
