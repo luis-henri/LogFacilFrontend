@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header />
-    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+    <main class="grow p-4 sm:p-6 lg:p-8">
       <!-- O 'page-container' agora usa flexbox para controlar a altura -->
       <div class="page-container">
         <div class="header-container">

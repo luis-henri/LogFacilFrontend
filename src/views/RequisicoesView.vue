@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header />
-    <main class="flex-grow">
+    <main class="grow">
       <div class="page-container">
         <div class="header-container">
           <div class="header-left">
