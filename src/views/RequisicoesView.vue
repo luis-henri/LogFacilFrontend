@@ -16,7 +16,7 @@
                 <button @click="goSeparacao" class="gouser-item">Separação</button>
                 <button @click="goConferencia" class="gouser-item">Conferência</button>
                 <button @click="goEmbalagem" class="gouser-item">Embalagem</button>
-                <button @click="goExpedicao" class="gouser-item">Expedição</button>
+                <button @click="goExpedicao" class="gouser-item">Conferência/Remessa</button>
                 <button @click="handleLogout" class="dropdown-item">Sair</button>
               </div>
             </div>
