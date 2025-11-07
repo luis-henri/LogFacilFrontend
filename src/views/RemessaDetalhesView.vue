@@ -191,7 +191,7 @@ async function finalizarRequisicao() {
 
   } catch (error) {
     console.error("Erro ao finalizar requisição:", error);
-    showNotification('Erro',"Não foi possível finalizar a requisição.");
+    showNotification('Erro',"Não foi possível finalizar a requisição. Confira todos o(s) volume(s).");
   } finally {
     isSaving.value = false;
   }
