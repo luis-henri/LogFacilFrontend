@@ -37,7 +37,7 @@
                   </div>
                 </td>
                 <td data-label="Ações" class="text-center">
-                  <button @click="iniciarRemessa(req)" class="button-primary text-xs">Iniciar Remessa</button>
+                  <button @click="iniciarRemessa(req)" class="button-primary text-xs">Iniciar Conferência</button>
                 </td>
               </tr>
             </tbody>
