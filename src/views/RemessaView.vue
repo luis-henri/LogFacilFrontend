@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header title="Requisições - Remessa" />
-    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+    <main class="grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
         <div class="header-container">
           <h2 class="container-title">Conferência - Remessa</h2>
@@ -37,7 +37,7 @@
                   </div>
                 </td>
                 <td data-label="Ações" class="text-center">
-                  <button @click="iniciarRemessa(req)" class="button-primary text-xs">Iniciar Remessa</button>
+                  <button @click="iniciarRemessa(req)" class="button-primary text-xs">Iniciar Conferência</button>
                 </td>
               </tr>
             </tbody>

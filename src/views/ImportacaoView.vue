@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex flex-col">
-    <div class="flex-grow p-4 sm:p-6 lg:p-8 flex items-center justify-center">
-      <div class="import-box">
-        <Header />
+      <div class="page-container">
+        <div class="content-container">
+          <div class="import-box">
+          <Header />
         <h2 class="title">Importação de Requisições</h2>
         <p class="subtitle">Selecione o arquivo .txt para importar os dados para o sistema.</p>
 
@@ -31,7 +31,7 @@
         </button>
       </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -98,17 +98,29 @@ function goToRequisicoes() {
 </script>
 
 <style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ocupa toda a tela */
+}
+.content-container {
+  flex: 1;                       /* ocupa o espaço restante */
+  display: flex;
+  align-items: center;           /* centraliza verticalmente */
+  justify-content: center;       /* centraliza horizontalmente */
+  padding: 1rem;                 /* espaçamento responsivo */
+}
 .import-box {
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 600px;              /* tamanho máximo */
+  text-align: center;
+  /* pequeno deslocamento para ficar "um pouco mais para baixo" */
+  transform: translateY(6vh);    /* desloca para baixo 6% da altura da viewport */
 }
-
 .title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -230,7 +242,9 @@ function goToRequisicoes() {
 /* LÓGICA DE RESPONSIVIDADE ADICIONADA AQUI */
 @media (max-width: 640px) {
   .import-box {
-    padding: 24px;
+    transform: translateY(3vh);
+    padding: 1.25rem;
+    max-width: 92%;
   }
 
   .title {
@@ -247,6 +261,12 @@ function goToRequisicoes() {
   .button-tertiary {
     font-size: 0.9rem;
     padding: 10px 16px;
+  }
+}
+@media (min-width: 1024px) {
+  .import-box {
+    max-width: 540px;
+    transform: translateY(6vh);
   }
 }
 </style>

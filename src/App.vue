@@ -11,19 +11,15 @@
 
 <style>
 /* Estilos globais para o corpo da página */
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-#app-container {
-  width: 100%;
-  min-height: 100vh;
+html, body {
   height: 100%;
-  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#app-container {
+  min-height: 100vh;       /* garante 100% da altura da viewport */
+  display: flex;
+  flex-direction: column;  /* header (se houver) + conteúdo */
 }
 </style>

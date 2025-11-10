@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header title="Requisições - Embalagem" />
-    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+    <main class="grow p-4 sm:p-6 lg:p-8">
       <div class="page-container">
         <div class="header-container">
           <h2 class="container-title">Requisição - Embalagem</h2>
