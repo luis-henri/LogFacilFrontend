@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header />
-    <main class="flex-grow">
+    <main class="grow">
       <div class="page-container">
         <div class="header-container">
           <div class="header-left">
@@ -16,7 +16,7 @@
                 <button @click="goSeparacao" class="gouser-item">Separação</button>
                 <button @click="goConferencia" class="gouser-item">Conferência</button>
                 <button @click="goEmbalagem" class="gouser-item">Embalagem</button>
-                <button @click="goExpedicao" class="gouser-item">Expedição</button>
+                <button @click="goExpedicao" class="gouser-item">Conferência/Remessa</button>
                 <button @click="handleLogout" class="dropdown-item">Sair</button>
               </div>
             </div>

@@ -10,7 +10,7 @@
 
       <!-- Lista de Opções -->
       <div v-else class="options-container">
-        <!-- Opção para usar o padrão (Normal PAC) -->
+        <!-- Opção para usar o padrão (Normal PAC)
         <div class="radio-item">
           <input 
             type="radio" 
@@ -21,7 +21,7 @@
           <label for="envio-padrao">
             Normal (PAC)
           </label>
-        </div>
+        </div> -->
         
         <!-- Opções de tipos de envio -->
         <div v-for="tipo in tiposEnvio" :key="tipo.id_tipo_envio_requisicao" class="radio-item">
@@ -61,7 +61,7 @@ const selecaoInterna = ref<number | null>(null);
 // Quando o popup se torna visível, atualiza a seleção interna
 watch(() => props.visible, (isVisible) => {
   if (isVisible) {
-    selecaoInterna.value = props.selecaoAtual || 4; // 4 é o ID do envio padrão (Normal PAC)
+    selecaoInterna.value = props.selecaoAtual; // 4 é o ID do envio padrão (Normal PAC)
   }
 });
 

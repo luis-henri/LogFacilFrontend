@@ -14,7 +14,7 @@
         <div><strong>Tipo de Envio:</strong> {{ requisicao.tipo_envio?.descricao_tipo_envio_requisicao || 'Não definido' }}</div>
       </div>
 
-      <h3 class="items-title">Medidas do Pacote</h3>
+      <h3 class="items-title">Dimensões do Volume</h3>
       <div v-if="!requisicao.volumes || requisicao.volumes.length === 0" class="no-data-message">
         Nenhum volume registado para esta requisição.
       </div>
@@ -60,12 +60,18 @@
     </div>
     <div v-if="loading" class="loading-message">Carregando detalhes da remessa...</div>
     
-    <footer class="footer-actions">
-        <button @click="goBack" class="button-secondary">Voltar</button>
-        <button @click="finalizarRequisicao" class="button-primary" :disabled="isSaving">
-            {{ isSaving ? 'Aguarde...' : 'Efetiva Conferência' }}
-        </button>
-    </footer>
+  <footer class="footer-actions">
+    <button @click="goBack" class="button-secondary">Voltar</button>
+    <!-- Disable finalize unless ALL volumes are selected and not saving -->
+    <button
+      @click="finalizarRequisicao"
+      class="button-primary"
+      :disabled="isSaving || !allSelected"
+      title="Marque todas as caixas para poder efetivar"
+    >
+      {{ isSaving ? 'Aguarde...' : 'Efetiva Conferência' }}
+    </button>
+  </footer>
     </div>
     </main>
     <NotificationPopUp
@@ -179,19 +185,26 @@ onMounted(async () => {
 });
 
 async function finalizarRequisicao() {
-  if (!requisicao.value || !temVolumesSelecionados.value) return;
-  
+  // Require that all volumes are selected before finalizing
+  if (!requisicao.value) return;
+
+  if (!allSelected.value) {
+    // If not all selected, show a notification and do not proceed
+    showNotification('Atenção', 'Você deve selecionar todas as caixas antes de efetivar a conferência.');
+    return;
+  }
+
   isSaving.value = true;
   try {
     await atualizarRequisicao(requisicao.value.id_requisicao, { status: 'concluida' });
-    
+
     acaoConcluida.title = 'Requisição Finalizada!';
     acaoConcluida.message = 'A requisição foi finalizada com sucesso.';
     acaoConcluida.visible = true;
 
   } catch (error) {
     console.error("Erro ao finalizar requisição:", error);
-    showNotification('Erro',"Não foi possível finalizar a requisição.");
+    showNotification('Erro',"Não foi possível finalizar a requisição. Tente novamente mais tarde.");
   } finally {
     isSaving.value = false;
   }
