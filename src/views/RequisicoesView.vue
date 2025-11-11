@@ -225,8 +225,10 @@ onMounted(async () => {
           userName.value = 'Usuário';
       }
   }
-  await carregarDados();
+  // Carregamos primeiro os tipos de envio para podermos aplicar e persistir
+  // o tipo padrão "Normal (PAC)" nas requisições que não tiverem tipo.
   await carregarTiposEnvio();
+  await carregarDados();
 });
 
 async function carregarTiposEnvio() {
@@ -344,15 +346,42 @@ async function carregarDados() {
   loading.value = true;
   try {
     const dadosApi = await obterRequisicoesPorStatus('pendente');
-    requisicoes.value = dadosApi.map(req => ({ 
-      ...req, 
-      checked: false,
-      // Define Normal (PAC) como padrão visual se não tiver tipo de envio
-      tipo_envio: req.tipo_envio || { 
-        id_tipo_envio_requisicao: 4, 
-        descricao_tipo_envio_requisicao: 'Normal (PAC)' 
+
+    // Encontra o id do tipo padrão (Normal (PAC)) nos tipos carregados
+    const defaultTipoId = await obterIdTipoEnvioPadrao();
+
+    // Prepara atualizações para persistir no backend quando necessário
+    const updates: Promise<any>[] = [];
+
+    requisicoes.value = await Promise.all(dadosApi.map(async (req: any) => {
+      const item = {
+        ...req,
+        checked: false,
+        tipo_envio: req.tipo_envio || null
+      };
+
+      // Se não houver tipo de envio definido, atribui o padrão localmente
+      // e persiste a alteração no backend (sem bloquear a UI).
+      if (!item.tipo_envio) {
+        item.tipo_envio = tiposEnvio.value.find((t: any) => t.id_tipo_envio_requisicao === defaultTipoId)
+          || { id_tipo_envio_requisicao: defaultTipoId, descricao_tipo_envio_requisicao: 'Normal (PAC)' };
+
+        // dispara atualização para persistir o tipo de envio
+        updates.push(
+          atualizarRequisicao(item.id_requisicao, { id_tipo_envio_requisicao: defaultTipoId })
+            .catch(err => {
+              console.error(`Falha ao persistir tipo de envio para req ${item.id_requisicao}:`, err);
+            })
+        );
       }
+
+      return item;
     }));
+
+    // Aguardar as atualizações em background; usamos allSettled para não rejeitar tudo
+    if (updates.length > 0) {
+      await Promise.allSettled(updates);
+    }
   } catch (error: any) {
     showNotification('erro', "Erro ao buscar dados: " + error.message);
   } finally {

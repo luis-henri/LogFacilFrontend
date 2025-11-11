@@ -1,0 +1,1 @@
+function f(r){if(typeof r!="string")return!1;const s=r.replace(/[^\d]+/g,"");if(s.length!==11||s.match(/(\d)\1{10}/))return!1;const e=s.split("").map(t=>+t),i=t=>{const n=e.slice(0,t).reduce((o,a,c)=>o+a*(t+1-c),0)*10%11;return n<10?n:0};return i(9)===e[9]&&i(10)===e[10]}export{f as i};
