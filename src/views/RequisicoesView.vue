@@ -22,6 +22,11 @@
             </div>
             <h2 class="container-title">Requisições - Atendimento</h2>
           </div>
+          <div>
+            <button @click="irParaImportacao" class="button-primary">
+                Voltar para Importação
+            </button>
+          </div>
         </div>
 
         <div class="table-scroll-container">
@@ -202,6 +207,10 @@ const acaoConcluida = reactive({
   title: '',
   message: '',
 });
+
+function irParaImportacao(){
+  router.push({name: 'Importacao'});
+}
 
 const sortedRequisicoes = computed(() => {
   return [...requisicoes.value].sort((a, b) => {
