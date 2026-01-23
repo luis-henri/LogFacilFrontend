@@ -14,9 +14,10 @@
             <thead>
               <tr>
                 <th>Número</th>
-                <th>Data/Hora</th>
+                <th>Data</th>
                 <th>Unidade</th>
-                <th>Prioridade - Envio</th>
+                <th>Prioridade</th>
+                <th>Envio</th>
                 <th class="text-center">Ações</th>
               </tr>
             </thead>
@@ -29,13 +30,17 @@
                 <td data-label="Número">{{ req.numero_requisicao }}</td>
                 <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
                 <td data-label="Unidade">{{ req.requisitante_requisicao }}</td>
-                <td data-label="Envio">
-                  <div class="envio-cell">
-                    <ArrowUpCircleIcon v-if="req.prioridade_requisicao" class="icon-prioridade-ativa"
-                      title="Prioritário" />
-                    <span>{{ req.tipo_envio?.descricao_tipo_envio_requisicao || '-' }}</span>
+                <td data-label="Prioridade">
+                <div>
+                  <ArrowUpCircleIcon v-if="req.prioridade_requisicao" class="icon-prioridade-ativa" title="Prioritário" />
+                  <span v-else>Não</span>
+                </div>
+              </td>
+              <td data-label="Envio">
+                  <div class="envio-cell">  
+                      <span>{{ req.tipo_envio?.descricao_tipo_envio_requisicao || '-' }}</span>
                   </div>
-                </td>
+              </td>
                 <td data-label="Ações" class="text-center">
                   <button @click="iniciarRemessa(req)" class="button-primary text-xs">Iniciar Conferência</button>
                 </td>

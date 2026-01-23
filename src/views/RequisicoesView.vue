@@ -35,10 +35,9 @@
             <thead>
               <tr>
                 <th><input type="checkbox" v-model="allSelected" @change="toggleSelectAll" /></th>
-                <th>Data/Hora</th>
-                <th>UR</th>
+                <th>Data</th>
+                <th>Unidade Requisitante</th>
                 <th>Número</th>
-                <th>Situação</th>
                 <th>Prioridade</th>
                 <th>Envio</th>
                 <th>Ações</th>
@@ -61,11 +60,6 @@
                 <td data-label="Data/Hora">{{ new Date(req.data_requisicao).toLocaleString('pt-BR') }}</td>
                 <td data-label="UR">{{ req.requisitante_requisicao }}</td>
                 <td data-label="Número">{{ req.numero_requisicao }}</td>
-                <td data-label="Situação">
-                  <span :class="['status-badge', getStatusClass(req.situacao.descricao_situacao_requisicao)]">
-                    {{ req.situacao.descricao_situacao_requisicao }}
-                  </span>
-                </td>
                 <td data-label="Prioridade">
                   <div class="envio-cell">
                     <div class="tooltip-container" :data-tooltip="req.prioridade_requisicao ? 'Desmarcar Prioridade' : 'Marcar como Prioritário'">
@@ -461,15 +455,6 @@ function goEmbalagem() {
 }
 function goExpedicao() {
   router.push({ name: 'Remessa' })
-}
-
-function getStatusClass(situacao: string): string {
-  if (!situacao) return '';
-  const statusNormalizado = situacao.toLowerCase().replace(/\s+/g, '-');
-  if (statusNormalizado === 'pendente' || statusNormalizado === 'recebida') {
-      return 'status-recebida';
-  }
-  return `status-${statusNormalizado}`;
 }
 
 </script>
