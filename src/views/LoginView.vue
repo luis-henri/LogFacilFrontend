@@ -18,8 +18,8 @@
             placeholder="Senha"
             required
           />
-          <EyeIcon v-if="!showPassword" @click="togglePassword" class="icon clickable" />
-          <EyeSlashIcon v-else @click="togglePassword" class="icon clickable" />
+          <EyeSlashIcon v-if="!showPassword" @click="togglePassword" class="icon clickable" />
+          <EyeIcon v-else @click="togglePassword" class="icon clickable" />
         </div>
         <button type="submit" class="button-primary" :disabled="isLoading">
           {{ isLoading ? 'Conectando...' : 'Entrar' }}
